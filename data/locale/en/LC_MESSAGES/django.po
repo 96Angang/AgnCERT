@@ -1,0 +1,1312 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-06-05 12:47+0900\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: config/settings.py:138
+msgid "English"
+msgstr ""
+
+#: config/settings.py:139
+msgid "Korean"
+msgstr ""
+
+#: core_cert/forms.py:16
+msgid "acme-dns (Fixed)"
+msgstr ""
+
+#: core_cert/forms.py:27
+msgid "e.g., example.com (Let's Encrypt)"
+msgstr ""
+
+#: core_cert/forms.py:31
+msgid "e.g., example.com or *.example.com"
+msgstr ""
+
+#: core_cert/forms.py:35
+msgid "Automatically suggested on domain input..."
+msgstr ""
+
+#: core_cert/forms.py:59 core_cert/templates/core_cert/certificate_form.html:23
+msgid "Title"
+msgstr ""
+
+#: core_cert/forms.py:60 core_cert/templates/core_cert/certificate_form.html:40
+msgid "CA Server"
+msgstr ""
+
+#: core_cert/forms.py:61
+msgid "Certificate path in acme.sh. (Suggested automatically)"
+msgstr ""
+
+#: core_cert/forms.py:64 core_cert/forms.py:65
+msgid "Calculated on issuance."
+msgstr ""
+
+#: core_cert/forms.py:112
+msgid "Server Name (e.g., Production Nginx)"
+msgstr ""
+
+#: core_cert/forms.py:119
+msgid "e.g., /etc/nginx/ssl"
+msgstr ""
+
+#: core_cert/forms.py:120
+msgid "e.g., /etc/httpd/conf.d/ssl.conf"
+msgstr ""
+
+#: core_cert/forms.py:147
+msgid "e.g., systemctl reload nginx or custom script"
+msgstr ""
+
+#: core_cert/forms.py:159
+msgid "Rename file (Optional)"
+msgstr ""
+
+#: core_cert/models.py:5
+msgid "Name"
+msgstr ""
+
+#: core_cert/models.py:8
+msgid "Unique certificate serial number"
+msgstr ""
+
+#: core_cert/models.py:12
+msgid "Whether it is a wildcard certificate (*.domain.com)"
+msgstr ""
+
+#: core_cert/models.py:13
+msgid "All domains included in the certificate (SANs)"
+msgstr ""
+
+#: core_cert/models.py:16
+msgid "Whether the certificate is managed by acme.sh"
+msgstr ""
+
+#: core_cert/models.py:17
+msgid "CA Server (e.g., letsencrypt, zerossl)"
+msgstr ""
+
+#: core_cert/models.py:18
+msgid "e.g., dns_cf, dns_aws"
+msgstr ""
+
+#: core_cert/models.py:73 core_cert/templates/core_cert/server_list.html:61
+msgid "Pending"
+msgstr ""
+
+#: core_cert/models.py:74 core_cert/templates/core_cert/server_list.html:57
+msgid "Connected"
+msgstr ""
+
+#: core_cert/models.py:75 core_cert/templates/core_cert/dashboard.html:30
+#: core_cert/templates/core_cert/server_list.html:59
+msgid "Failed"
+msgstr ""
+
+#: core_cert/models.py:79
+msgid "None"
+msgstr ""
+
+#: core_cert/models.py:86
+msgid "Default Path"
+msgstr ""
+
+#: core_cert/models.py:87 core_cert/templates/core_cert/server_form.html:61
+msgid "Custom Path"
+msgstr ""
+
+#: core_cert/models.py:90
+msgid "Input if custom path is selected (e.g., /etc/nginx/ssl)"
+msgstr ""
+
+#: core_cert/models.py:91
+msgid "SSL config file path (e.g., /etc/httpd/conf.d/ssl.conf)"
+msgstr ""
+
+#: core_cert/models.py:101
+msgid "Service port (usually 443)"
+msgstr ""
+
+#: core_cert/models.py:121
+msgid "Remote server path where the certificate will be stored"
+msgstr ""
+
+#: core_cert/models.py:122
+msgid "e.g., systemctl reload nginx"
+msgstr ""
+
+#: core_cert/models.py:124
+msgid "Create target directory"
+msgstr ""
+
+#: core_cert/models.py:125
+msgid "Transfer certificate files"
+msgstr ""
+
+#: core_cert/models.py:126
+msgid "Run post-processing script (EXEC)"
+msgstr ""
+
+#: core_cert/models.py:134
+msgid "Fullchain (fullchain.cer/pem)"
+msgstr ""
+
+#: core_cert/models.py:135
+msgid "Private Key (.key/pem)"
+msgstr ""
+
+#: core_cert/models.py:136
+msgid "Certificate (.cer/pem)"
+msgstr ""
+
+#: core_cert/models.py:137
+msgid "PFX (cert.pfx)"
+msgstr ""
+
+#: core_cert/models.py:140
+msgid "If empty, default filename will be used."
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_form.html:4
+#: core_cert/templates/core_cert/certificate_form.html:10
+msgid "Edit Certificate"
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_form.html:4
+#: core_cert/templates/core_cert/certificate_list.html:11
+msgid "Add Certificate"
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_form.html:12
+msgid "Register New Certificate"
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_form.html:15
+#: core_cert/templates/core_cert/server_form.html:15
+msgid "Back to List"
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_form.html:23
+msgid "(Optional — distinguishes certs with the same domain)"
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_form.html:29
+msgid "Domain (FQDN)"
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_form.html:33
+msgid "acme.sh Path"
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_form.html:44
+msgid "DNS Provider"
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_form.html:52
+msgid "Wildcard Certificate"
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_form.html:60
+#: core_cert/templates/core_cert/certificate_list.html:89
+msgid "Expiry Date"
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_form.html:64
+#: core_cert/templates/core_cert/certificate_list.html:100
+#: core_cert/templates/core_cert/dashboard.html:63
+#: core_cert/templates/core_cert/dashboard.html:184
+#: core_cert/templates/core_cert/server_list.html:152
+msgid "Status"
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_form.html:70
+#: core_cert/templates/core_cert/server_form.html:73
+#: core_cert/templates/core_cert/settings.html:26
+#: core_cert/templates/core_cert/settings.html:37
+#: core_cert/templates/core_cert/settings.html:54
+msgid "Save"
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_form.html:72
+msgid "Setup acme.sh Hook"
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_form.html:80
+msgid "Connected Deployment Scripts"
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_form.html:85
+#: core_cert/templates/core_cert/dashboard.html:152
+#: core_cert/templates/core_cert/script_list.html:19
+msgid "Script Name"
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_form.html:86
+msgid "Path"
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_form.html:87
+#: core_cert/templates/core_cert/certificate_list.html:53
+#: core_cert/templates/core_cert/dashboard.html:66
+#: core_cert/templates/core_cert/dashboard.html:154
+#: core_cert/templates/core_cert/script_list.html:23
+#: core_cert/templates/core_cert/server_list.html:32
+msgid "Actions"
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_form.html:96
+#: core_cert/templates/core_cert/dashboard.html:162
+#: core_cert/templates/core_cert/script_list.html:43
+msgid "Run"
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_form.html:103
+msgid "No connected scripts."
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_list.html:4
+msgid "Certificates & Deployment"
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_list.html:8
+msgid "Certificate & Deployment Management"
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_list.html:10
+msgid "Full Sync & Auto Hook"
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_list.html:20
+msgid "Auto Renewal & Deployment Schedule"
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_list.html:22
+msgid "Last Check"
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_list.html:22
+#: core_cert/templates/core_cert/settings.html:87
+msgid "No Record"
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_list.html:24
+msgid "Next run in"
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_list.html:29
+#: core_cert/templates/core_cert/dashboard.html:65
+#: core_cert/templates/core_cert/dashboard.html:185
+msgid "Time"
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_list.html:31
+#: core_cert/templates/core_cert/certificate_list.html:38
+msgid "Set"
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_list.html:36
+msgid "Renewal D-Day"
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_list.html:43
+msgid ""
+"Check all certificates for renewal and perform deployment now? (May take "
+"several minutes)"
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_list.html:43
+msgid "Run Check Now"
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_list.html:50
+#: core_cert/templates/core_cert/server_list.html:150
+msgid "Domain"
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_list.html:51
+msgid "Status (Expiry)"
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_list.html:52
+msgid "Scripts & Servers"
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_list.html:64
+msgid "DNS Challenge"
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_list.html:69
+msgid "Staging"
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_list.html:71
+msgid "Production"
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_list.html:74
+msgid "Wildcard"
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_list.html:79
+msgid "Allowed Domains"
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_list.html:95
+msgid "Renewal Expected Date"
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_list.html:102
+msgid "No Info"
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_list.html:120
+msgid "No target servers"
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_list.html:125
+msgid "No connected scripts"
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_list.html:130
+msgid "Issue test certificate (using staging server)"
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_list.html:130
+msgid "Test Issue"
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_list.html:131
+msgid "Issue new certificate or change settings"
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_list.html:131
+msgid "Issue"
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_list.html:134
+msgid "Renew with existing settings"
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_list.html:134
+msgid "Renew"
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_list.html:137
+#: core_cert/templates/core_cert/script_list.html:44
+#: core_cert/templates/core_cert/server_list.html:69
+msgid "Edit"
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_list.html:138
+#: core_cert/templates/core_cert/dashboard.html:89
+#: core_cert/templates/core_cert/script_list.html:45
+#: core_cert/templates/core_cert/server_list.html:12
+#: core_cert/templates/core_cert/server_list.html:70
+msgid "Delete"
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_list.html:144
+msgid "No domains registered. Try [Full Sync]."
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_list.html:161
+msgid "No Challenge Info"
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_list.html:168
+msgid ""
+"Please add the following CNAME record to your DNS settings for certificate "
+"issuance."
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_list.html:172
+msgid "Domain (Host)"
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_list.html:175
+#: core_cert/templates/core_cert/certificate_list.html:183
+#: core_cert/templates/core_cert/ssh_key_manage.html:22
+msgid "Copy"
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_list.html:180
+msgid "Value (Target)"
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_list.html:189
+msgid "DNS Challenge Info"
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_list.html:192
+#: core_cert/templates/core_cert/server_list.html:136
+#: core_cert/templates/core_cert/server_list.html:169
+#: core_cert/templates/core_cert/server_list.html:203
+msgid "Error"
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_list.html:192
+msgid "Failed to fetch information."
+msgstr ""
+
+#: core_cert/templates/core_cert/certificate_list.html:205
+msgid "Done!"
+msgstr ""
+
+#: core_cert/templates/core_cert/confirm_delete.html:4
+msgid "Confirm Delete"
+msgstr ""
+
+#: core_cert/templates/core_cert/confirm_delete.html:11
+msgid "Are you sure you want to delete?"
+msgstr ""
+
+#: core_cert/templates/core_cert/confirm_delete.html:14
+#, python-format
+msgid ""
+"\n"
+"            Are you sure you want to delete <strong>%(name)s</strong>?<br>\n"
+"            This action cannot be undone.\n"
+"            "
+msgstr ""
+
+#: core_cert/templates/core_cert/confirm_delete.html:27
+msgid "Delete physical certificate files (acme.sh folder)"
+msgstr ""
+
+#: core_cert/templates/core_cert/confirm_delete.html:30
+msgid ""
+"Warning: This will permanently remove the certificate folder from the server."
+msgstr ""
+
+#: core_cert/templates/core_cert/confirm_delete.html:36
+#: core_cert/templates/core_cert/server_form.html:74
+#: core_cert/templates/core_cert/server_ssh_setup.html:35
+#: templates/base.html:89
+msgid "Cancel"
+msgstr ""
+
+#: core_cert/templates/core_cert/confirm_delete.html:37
+msgid "Delete Now"
+msgstr ""
+
+#: core_cert/templates/core_cert/dashboard.html:4 templates/base.html:62
+msgid "Dashboard"
+msgstr ""
+
+#: core_cert/templates/core_cert/dashboard.html:8
+msgid "System Dashboard"
+msgstr ""
+
+#: core_cert/templates/core_cert/dashboard.html:10
+msgid "Certificate Management"
+msgstr ""
+
+#: core_cert/templates/core_cert/dashboard.html:11
+#: core_cert/templates/core_cert/settings.html:4
+#: core_cert/templates/core_cert/settings.html:8
+msgid "System Settings"
+msgstr ""
+
+#: core_cert/templates/core_cert/dashboard.html:18
+msgid "Total Certificates"
+msgstr ""
+
+#: core_cert/templates/core_cert/dashboard.html:21
+msgid "Expired"
+msgstr ""
+
+#: core_cert/templates/core_cert/dashboard.html:22
+msgid "Expiring Soon"
+msgstr ""
+
+#: core_cert/templates/core_cert/dashboard.html:26
+msgid "Target Servers"
+msgstr ""
+
+#: core_cert/templates/core_cert/dashboard.html:29
+msgid "Healthy"
+msgstr ""
+
+#: core_cert/templates/core_cert/dashboard.html:34
+msgid "Unresolved Failures"
+msgstr ""
+
+#: core_cert/templates/core_cert/dashboard.html:35
+msgid " items"
+msgstr ""
+
+#: core_cert/templates/core_cert/dashboard.html:36
+msgid "Deployment tasks needing attention (Total)"
+msgstr ""
+
+#: core_cert/templates/core_cert/dashboard.html:45
+msgid "Unresolved Deployment Failures"
+msgstr ""
+
+#: core_cert/templates/core_cert/dashboard.html:48
+#: core_cert/templates/core_cert/script_detail.html:26
+msgid "Resolve Selected"
+msgstr ""
+
+#: core_cert/templates/core_cert/dashboard.html:49
+#: core_cert/templates/core_cert/script_detail.html:27
+msgid "Delete Selected"
+msgstr ""
+
+#: core_cert/templates/core_cert/dashboard.html:62
+msgid "Script (Domain)"
+msgstr ""
+
+#: core_cert/templates/core_cert/dashboard.html:64
+msgid "Error Summary"
+msgstr ""
+
+#: core_cert/templates/core_cert/dashboard.html:88
+msgid "Resolved"
+msgstr ""
+
+#: core_cert/templates/core_cert/dashboard.html:89
+#: core_cert/templates/core_cert/script_detail.html:87
+msgid "Delete this log?"
+msgstr ""
+
+#: core_cert/templates/core_cert/dashboard.html:128
+#: core_cert/templates/core_cert/script_detail.html:175
+msgid "Delete selected "
+msgstr ""
+
+#: core_cert/templates/core_cert/dashboard.html:128
+#: core_cert/templates/core_cert/script_detail.html:175
+msgid " logs?"
+msgstr ""
+
+#: core_cert/templates/core_cert/dashboard.html:128
+#: core_cert/templates/core_cert/script_detail.html:175
+msgid "Mark selected "
+msgstr ""
+
+#: core_cert/templates/core_cert/dashboard.html:128
+#: core_cert/templates/core_cert/script_detail.html:175
+msgid " logs as resolved?"
+msgstr ""
+
+#: core_cert/templates/core_cert/dashboard.html:146
+#: core_cert/templates/core_cert/script_list.html:4
+#: core_cert/templates/core_cert/script_list.html:8
+msgid "Deployment Scripts"
+msgstr ""
+
+#: core_cert/templates/core_cert/dashboard.html:153
+msgid "Target Domain"
+msgstr ""
+
+#: core_cert/templates/core_cert/dashboard.html:166
+#: core_cert/templates/core_cert/script_list.html:51
+msgid "No scripts registered."
+msgstr ""
+
+#: core_cert/templates/core_cert/dashboard.html:177
+msgid "Recent Deployment Logs"
+msgstr ""
+
+#: core_cert/templates/core_cert/dashboard.html:183
+msgid "Script"
+msgstr ""
+
+#: core_cert/templates/core_cert/dashboard.html:201
+msgid "No recent logs."
+msgstr ""
+
+#: core_cert/templates/core_cert/dashboard.html:212
+msgid "Need to change system settings?"
+msgstr ""
+
+#: core_cert/templates/core_cert/dashboard.html:212
+msgid "Go to Settings Management"
+msgstr ""
+
+#: core_cert/templates/core_cert/dashboard.html:212
+msgid "to update auto-renewal time and API information."
+msgstr ""
+
+#: core_cert/templates/core_cert/script_detail.html:4
+msgid "Deployment"
+msgstr ""
+
+#: core_cert/templates/core_cert/script_detail.html:8
+msgid "Script Info"
+msgstr ""
+
+#: core_cert/templates/core_cert/script_detail.html:9
+#: core_cert/templates/core_cert/script_list.html:20
+msgid "Connected Domain"
+msgstr ""
+
+#: core_cert/templates/core_cert/script_detail.html:10
+msgid "Start Deployment"
+msgstr ""
+
+#: core_cert/templates/core_cert/script_detail.html:14
+msgid "Real-time Deployment Logs"
+msgstr ""
+
+#: core_cert/templates/core_cert/script_detail.html:16
+msgid "Click the button above to start deployment..."
+msgstr ""
+
+#: core_cert/templates/core_cert/script_detail.html:23
+msgid "Execution History"
+msgstr ""
+
+#: core_cert/templates/core_cert/script_detail.html:38
+msgid "Select All"
+msgstr ""
+
+#: core_cert/templates/core_cert/script_detail.html:57
+msgid "Site applied successfully"
+msgstr ""
+
+#: core_cert/templates/core_cert/script_detail.html:59
+msgid "Certificate mismatch on site"
+msgstr ""
+
+#: core_cert/templates/core_cert/script_detail.html:62
+msgid "Failed to connect to site"
+msgstr ""
+
+#: core_cert/templates/core_cert/script_detail.html:76
+msgid "Success"
+msgstr ""
+
+#: core_cert/templates/core_cert/script_detail.html:76
+msgid "Failure"
+msgstr ""
+
+#: core_cert/templates/core_cert/script_detail.html:85
+msgid "Mark as Resolved"
+msgstr ""
+
+#: core_cert/templates/core_cert/script_detail.html:87
+msgid "Delete Log"
+msgstr ""
+
+#: core_cert/templates/core_cert/script_detail.html:93
+msgid "No execution history."
+msgstr ""
+
+#: core_cert/templates/core_cert/script_detail.html:122
+#: core_cert/templates/core_cert/script_detail.html:142
+msgid "System"
+msgstr ""
+
+#: core_cert/templates/core_cert/script_detail.html:122
+msgid "Connected to deployment server."
+msgstr ""
+
+#: core_cert/templates/core_cert/script_detail.html:142
+msgid "Sending deployment request..."
+msgstr ""
+
+#: core_cert/templates/core_cert/script_list.html:10
+msgid "Back"
+msgstr ""
+
+#: core_cert/templates/core_cert/script_list.html:11
+msgid "Add Script"
+msgstr ""
+
+#: core_cert/templates/core_cert/script_list.html:21
+msgid "Targets"
+msgstr ""
+
+#: core_cert/templates/core_cert/script_list.html:22
+msgid "Last Executed"
+msgstr ""
+
+#: core_cert/templates/core_cert/script_list.html:36 templates/base.html:64
+msgid "Servers"
+msgstr ""
+
+#: core_cert/templates/core_cert/script_list.html:39
+msgid "No History"
+msgstr ""
+
+#: core_cert/templates/core_cert/server_form.html:4
+#: core_cert/templates/core_cert/server_form.html:10
+msgid "Edit Server"
+msgstr ""
+
+#: core_cert/templates/core_cert/server_form.html:4
+#: core_cert/templates/core_cert/server_list.html:15
+msgid "Add Server"
+msgstr ""
+
+#: core_cert/templates/core_cert/server_form.html:12
+msgid "Register New Target Server"
+msgstr ""
+
+#: core_cert/templates/core_cert/server_form.html:24
+#: core_cert/templates/core_cert/server_list.html:28
+msgid "Server Name"
+msgstr ""
+
+#: core_cert/templates/core_cert/server_form.html:28
+msgid "IP Address"
+msgstr ""
+
+#: core_cert/templates/core_cert/server_form.html:35
+msgid "SSH User"
+msgstr ""
+
+#: core_cert/templates/core_cert/server_form.html:39
+msgid "SSH Port"
+msgstr ""
+
+#: core_cert/templates/core_cert/server_form.html:46
+msgid "OS Type"
+msgstr ""
+
+#: core_cert/templates/core_cert/server_form.html:50
+msgid "Web Server"
+msgstr ""
+
+#: core_cert/templates/core_cert/server_form.html:57
+msgid "Path Mode"
+msgstr ""
+
+#: core_cert/templates/core_cert/server_form.html:67
+msgid "SSL Config File Path"
+msgstr ""
+
+#: core_cert/templates/core_cert/server_form.html:69
+msgid "For site test verification. e.g., /etc/httpd/conf.d/ssl.conf"
+msgstr ""
+
+#: core_cert/templates/core_cert/server_list.html:4
+#: core_cert/templates/core_cert/server_list.html:8
+msgid "Server Management"
+msgstr ""
+
+#: core_cert/templates/core_cert/server_list.html:11
+#: core_cert/templates/core_cert/server_list.html:99
+msgid "selected"
+msgstr ""
+
+#: core_cert/templates/core_cert/server_list.html:13
+#: core_cert/templates/core_cert/server_list.html:68
+msgid "Site Test"
+msgstr ""
+
+#: core_cert/templates/core_cert/server_list.html:29
+msgid "IP / SSH"
+msgstr ""
+
+#: core_cert/templates/core_cert/server_list.html:30
+msgid "OS / WebServer"
+msgstr ""
+
+#: core_cert/templates/core_cert/server_list.html:31
+msgid "SSH Status"
+msgstr ""
+
+#: core_cert/templates/core_cert/server_list.html:66
+msgid "Setup SSH public key on target server"
+msgstr ""
+
+#: core_cert/templates/core_cert/server_list.html:66
+msgid "Keys"
+msgstr ""
+
+#: core_cert/templates/core_cert/server_list.html:67
+msgid "SSH connection test"
+msgstr ""
+
+#: core_cert/templates/core_cert/server_list.html:67
+msgid "SSH Test"
+msgstr ""
+
+#: core_cert/templates/core_cert/server_list.html:68
+msgid "Site certificate verification"
+msgstr ""
+
+#: core_cert/templates/core_cert/server_list.html:76
+msgid "No servers registered."
+msgstr ""
+
+#: core_cert/templates/core_cert/server_list.html:116
+msgid "Are you sure you want to delete selected "
+msgstr ""
+
+#: core_cert/templates/core_cert/server_list.html:116
+msgid " servers? Connected deployment scripts may be affected."
+msgstr ""
+
+#: core_cert/templates/core_cert/server_list.html:121
+msgid "Selected servers"
+msgstr ""
+
+#: core_cert/templates/core_cert/server_list.html:127
+msgid "Verifying sites..."
+msgstr ""
+
+#: core_cert/templates/core_cert/server_list.html:127
+msgid "Analyzing and verifying domains on "
+msgstr ""
+
+#: core_cert/templates/core_cert/server_list.html:127
+msgid "May take several minutes depending on the number of servers."
+msgstr ""
+
+#: core_cert/templates/core_cert/server_list.html:151
+msgid "Port"
+msgstr ""
+
+#: core_cert/templates/core_cert/server_list.html:153
+msgid "Expiry (Site)"
+msgstr ""
+
+#: core_cert/templates/core_cert/server_list.html:160
+#: core_cert/templates/core_cert/server_list.html:163
+msgid "Match"
+msgstr ""
+
+#: core_cert/templates/core_cert/server_list.html:160
+#: core_cert/templates/core_cert/server_list.html:167
+msgid "Mismatch"
+msgstr ""
+
+#: core_cert/templates/core_cert/server_list.html:164
+#: core_cert/templates/core_cert/server_list.html:165
+msgid "Unmanaged"
+msgstr ""
+
+#: core_cert/templates/core_cert/server_list.html:177
+msgid "Not in system"
+msgstr ""
+
+#: core_cert/templates/core_cert/server_list.html:189
+msgid "No domains found."
+msgstr ""
+
+#: core_cert/templates/core_cert/server_list.html:196
+msgid ""
+"To exclude a domain from this list, add the following comment in its config "
+"block (VirtualHost or server):"
+msgstr ""
+
+#: core_cert/templates/core_cert/server_list.html:200
+msgid "Integrated Verification Result"
+msgstr ""
+
+#: core_cert/templates/core_cert/server_list.html:203
+msgid "A communication error occurred during verification."
+msgstr ""
+
+#: core_cert/templates/core_cert/server_ssh_setup.html:4
+msgid "SSH Key Setup"
+msgstr ""
+
+#: core_cert/templates/core_cert/server_ssh_setup.html:8
+msgid "SSH Public Key Registration"
+msgstr ""
+
+#: core_cert/templates/core_cert/server_ssh_setup.html:9
+msgid ""
+"To deploy certificates to the target server, you must register this system's "
+"public key."
+msgstr ""
+
+#: core_cert/templates/core_cert/server_ssh_setup.html:12
+msgid "Target Server"
+msgstr ""
+
+#: core_cert/templates/core_cert/server_ssh_setup.html:13
+msgid "Address"
+msgstr ""
+
+#: core_cert/templates/core_cert/server_ssh_setup.html:14
+msgid "User"
+msgstr ""
+
+#: core_cert/templates/core_cert/server_ssh_setup.html:20
+msgid "SSH Password"
+msgstr ""
+
+#: core_cert/templates/core_cert/server_ssh_setup.html:21
+msgid "Enter SSH user password"
+msgstr ""
+
+#: core_cert/templates/core_cert/server_ssh_setup.html:23
+msgid ""
+"* Password is used only once for key registration and is not stored in the "
+"database."
+msgstr ""
+
+#: core_cert/templates/core_cert/server_ssh_setup.html:28
+#, python-format
+msgid ""
+"In case of SSH test failure, you may need to check the %%ProgramData%%\\ssh "
+"path."
+msgstr ""
+"In case of SSH test failure, you may need to check the %%ProgramData%%\\ssh "
+"path."
+
+#: core_cert/templates/core_cert/server_ssh_setup.html:34
+msgid "Register SSH Key"
+msgstr ""
+
+#: core_cert/templates/core_cert/server_ssh_setup.html:40
+msgid "Manual Registration Method"
+msgstr ""
+
+#: core_cert/templates/core_cert/server_ssh_setup.html:42
+msgid ""
+"If automatic registration via password fails, you can manually copy the "
+"public key and add it to the authorized_keys file on the target server."
+msgstr ""
+
+#: core_cert/templates/core_cert/server_ssh_setup.html:44
+msgid "Go to SSH Key Management to check public key"
+msgstr ""
+
+#: core_cert/templates/core_cert/settings.html:9
+msgid "Back to Dashboard"
+msgstr ""
+
+#: core_cert/templates/core_cert/settings.html:13
+msgid "Global Settings Management"
+msgstr ""
+
+#: core_cert/templates/core_cert/settings.html:17
+msgid "acme-dns Server Settings"
+msgstr ""
+
+#: core_cert/templates/core_cert/settings.html:18
+msgid "acme-dns server info for wildcard certificate issuance."
+msgstr ""
+
+#: core_cert/templates/core_cert/settings.html:25
+msgid "e.g., http://acme-dns.your-domain.com:8080"
+msgstr ""
+
+#: core_cert/templates/core_cert/settings.html:33
+msgid "CNAME Target Domain"
+msgstr ""
+
+#: core_cert/templates/core_cert/settings.html:36
+msgid "e.g., auth.your-domain.com"
+msgstr ""
+
+#: core_cert/templates/core_cert/settings.html:45
+msgid "ZeroSSL Settings"
+msgstr ""
+
+#: core_cert/templates/core_cert/settings.html:46
+msgid ""
+"Email address for ZeroSSL account registration. Required when using ZeroSSL "
+"as the CA server."
+msgstr ""
+
+#: core_cert/templates/core_cert/settings.html:50
+msgid "ZeroSSL Account Email"
+msgstr ""
+
+#: core_cert/templates/core_cert/settings.html:53
+msgid "e.g., admin@your-domain.com"
+msgstr ""
+
+#: core_cert/templates/core_cert/settings.html:62
+msgid "Auto Renewal Schedule"
+msgstr ""
+
+#: core_cert/templates/core_cert/settings.html:63
+msgid ""
+"Automatically check for expiry and perform renewal/deployment at the set "
+"time every day."
+msgstr ""
+
+#: core_cert/templates/core_cert/settings.html:67
+msgid "Daily execution time (HH:MM)"
+msgstr ""
+
+#: core_cert/templates/core_cert/settings.html:71
+#: core_cert/templates/core_cert/settings.html:81
+msgid "Update Settings"
+msgstr ""
+
+#: core_cert/templates/core_cert/settings.html:77
+msgid "Renewal Threshold (Days before expiry)"
+msgstr ""
+
+#: core_cert/templates/core_cert/settings.html:86
+msgid "Next scheduled"
+msgstr ""
+
+#: core_cert/templates/core_cert/settings.html:87
+msgid "Last run"
+msgstr ""
+
+#: core_cert/templates/core_cert/settings.html:89
+msgid "Check all certificates for renewal and perform deployment now?"
+msgstr ""
+
+#: core_cert/templates/core_cert/settings.html:89
+msgid "Run Manually Now"
+msgstr ""
+
+#: core_cert/templates/core_cert/ssh_key_manage.html:4
+#: core_cert/templates/core_cert/ssh_key_manage.html:8
+msgid "SSH Key Management"
+msgstr ""
+
+#: core_cert/templates/core_cert/ssh_key_manage.html:13
+msgid "Current Public Keys"
+msgstr ""
+
+#: core_cert/templates/core_cert/ssh_key_manage.html:14
+msgid ""
+"These keys are registered on target servers to enable certificate "
+"deployment. (ED25519 is recommended for security and performance.)"
+msgstr ""
+
+#: core_cert/templates/core_cert/ssh_key_manage.html:19
+msgid "Public Key"
+msgstr ""
+
+#: core_cert/templates/core_cert/ssh_key_manage.html:26
+msgid "No public keys registered. Please generate or register a key."
+msgstr ""
+
+#: core_cert/templates/core_cert/ssh_key_manage.html:33
+msgid "Manual SSH Key Registration"
+msgstr ""
+
+#: core_cert/templates/core_cert/ssh_key_manage.html:34
+msgid "You can register existing SSH keys by entering text or uploading files."
+msgstr ""
+
+#: core_cert/templates/core_cert/ssh_key_manage.html:41
+msgid "Private Key"
+msgstr ""
+
+#: core_cert/templates/core_cert/ssh_key_manage.html:46
+msgid "Public Key (Optional)"
+msgstr ""
+
+#: core_cert/templates/core_cert/ssh_key_manage.html:53
+msgid "Save Keys Manually"
+msgstr ""
+
+#: core_cert/templates/core_cert/ssh_key_manage.html:54
+msgid ""
+"* If public key is not provided, it will attempt to generate it from the "
+"private key."
+msgstr ""
+
+#: core_cert/templates/core_cert/ssh_key_manage.html:61
+msgid "Danger Zone: Regenerate Keys"
+msgstr ""
+
+#: core_cert/templates/core_cert/ssh_key_manage.html:62
+msgid "Regenerating SSH keys may disconnect all currently registered servers."
+msgstr ""
+
+#: core_cert/templates/core_cert/ssh_key_manage.html:63
+msgid "Are you sure you want to regenerate SSH keys?"
+msgstr ""
+
+#: core_cert/templates/core_cert/ssh_key_manage.html:65
+msgid "Generate New Key Set (Deletes Existing)"
+msgstr ""
+
+#: core_cert/templates/core_cert/ssh_key_manage.html:73
+msgid "Public key copied to clipboard."
+msgstr ""
+
+#: core_cert/views.py:33
+#, python-brace-format
+msgid "Settings ({key}) saved."
+msgstr ""
+
+#: core_cert/views.py:99
+#, python-brace-format
+msgid "{count} certificates synchronized."
+msgstr ""
+
+#: core_cert/views.py:106
+msgid "Full renewal and deployment process started in the background."
+msgstr ""
+
+#: core_cert/views.py:119
+#, python-brace-format
+msgid "{domain} deployment hook setup completed."
+msgstr ""
+
+#: core_cert/views.py:120
+#, python-brace-format
+msgid "Failed: {error}"
+msgstr ""
+
+#: core_cert/views.py:121
+#, python-brace-format
+msgid "Error: {error}"
+msgstr ""
+
+#: core_cert/views.py:136
+#, python-brace-format
+msgid "{hh}h {mm}m left"
+msgstr ""
+
+#: core_cert/views.py:137
+msgid "Calculation failed"
+msgstr ""
+
+#: core_cert/views.py:186
+#, python-brace-format
+msgid "Server '{name}' deleted."
+msgstr ""
+
+#: core_cert/views.py:187
+msgid "Delete Server"
+msgstr ""
+
+#: core_cert/views.py:196
+#, python-brace-format
+msgid "SSH connection successful: {name}"
+msgstr ""
+
+#: core_cert/views.py:197
+#, python-brace-format
+msgid "SSH connection failed: {error}"
+msgstr ""
+
+#: core_cert/views.py:206
+msgid "SSH key registered successfully"
+msgstr ""
+
+#: core_cert/views.py:207
+#, python-brace-format
+msgid "Registration failed: {error}"
+msgstr ""
+
+#: core_cert/views.py:214
+msgid "Regeneration completed"
+msgstr ""
+
+#: core_cert/views.py:217
+msgid "Saved successfully"
+msgstr ""
+
+#: core_cert/views.py:239
+msgid "Marked as resolved."
+msgstr ""
+
+#: core_cert/views.py:242
+msgid "Deleted successfully"
+msgstr ""
+
+#: core_cert/views.py:251
+#, python-brace-format
+msgid "{count} items marked as resolved."
+msgstr ""
+
+#: core_cert/views.py:252
+#, python-brace-format
+msgid "{count} items deleted."
+msgstr ""
+
+#: core_cert/views.py:497
+#, python-brace-format
+msgid "Certificate files for {domain} have been deleted."
+msgstr ""
+
+#: core_cert/views.py:499
+#, python-brace-format
+msgid "Error deleting files: {error}"
+msgstr ""
+
+#: core_cert/views.py:502
+#, python-brace-format
+msgid "Certificate {domain} removed from database."
+msgstr ""
+
+#: core_cert/views.py:507
+msgid "Delete Certificate"
+msgstr ""
+
+#: templates/base.html:45
+msgid "Toggle Theme"
+msgstr ""
+
+#: templates/base.html:51
+msgid "User Profile"
+msgstr ""
+
+#: templates/base.html:63
+msgid "Certificates"
+msgstr ""
+
+#: templates/base.html:65
+msgid "Scripts"
+msgstr ""
+
+#: templates/base.html:66
+msgid "SSH Keys"
+msgstr ""
+
+#: templates/base.html:67
+msgid "Settings"
+msgstr ""
+
+#: templates/base.html:69 templates/registration/login.html:4
+#: templates/registration/login.html:11 templates/registration/login.html:22
+msgid "Login"
+msgstr ""
+
+#: templates/base.html:90
+msgid "Confirm"
+msgstr ""
+
+#: templates/base.html:115
+msgid "Profile"
+msgstr ""
+
+#: templates/base.html:128
+msgid "Language"
+msgstr ""
+
+#: templates/base.html:146
+msgid "Admin Page"
+msgstr ""
+
+#: templates/base.html:151
+msgid "Logout"
+msgstr ""
+
+#: templates/registration/login.html:15
+msgid "Username"
+msgstr ""
+
+#: templates/registration/login.html:19
+msgid "Password"
+msgstr ""
+
+#: templates/registration/login.html:26
+msgid "Invalid username or password."
+msgstr ""

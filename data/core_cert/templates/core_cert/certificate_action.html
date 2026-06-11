@@ -1,0 +1,307 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{{ title }} - AgnCert{% endblock %}
+
+{% block content %}
+{# CSRF 토큰을 명시적으로 렌더 (이 페이지는 폼이 없어 JS fetch가 토큰을 못 찾는 문제 방지) #}
+<form style="display:none;">{% csrf_token %}</form>
+<div style="margin-bottom: 20px;">
+    <a href="{% url 'core_cert:certificate_list' %}" style="text-decoration: none; color: #64748b;">&larr; 목록으로 돌아가기</a>
+</div>
+
+<div class="card">
+    <h3 style="margin-top: 0;">{{ title }}: {{ cert.domain }}</h3>
+    <div style="display: grid; grid-template-columns: 120px 1fr; gap: 10px; margin-bottom: 20px;">
+        <span style="font-weight: 600; color: #64748b;">DNS Provider:</span>
+        <span>{{ cert.dns_provider|default:"없음 (HTTP 방식 사용)" }}</span>
+        
+        <span style="font-weight: 600; color: #64748b;">상태:</span>
+        <span>{{ cert.status }}</span>
+        
+        <span style="font-weight: 600; color: #64748b;">만료일:</span>
+        <span>{{ cert.expiry_date|date:"Y-m-d H:i"|default:"정보 없음" }}</span>
+    </div>
+    
+    <div style="padding: 15px; background: #fffbeb; border: 1px solid #fef3c7; border-radius: 6px; margin-bottom: 20px; color: #92400e; font-size: 0.9rem;">
+        <strong>주의:</strong> 인증서 발급/갱신 프로세스는 수 분이 소요될 수 있습니다. 브라우저 창을 닫지 말고 로그를 확인해 주세요.
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+        <button id="start-action" class="btn" style="background-color: #3b82f6; min-width: 160px;{% if not cert.is_acme %} opacity:0.5; cursor:not-allowed;{% endif %}"{% if not cert.is_acme %} disabled{% endif %}>{{ title }} 시작</button>
+        <button id="check-cname" class="btn" style="background-color: #475569; min-width: 140px;">CNAME 정보 확인</button>
+        <button id="regen-files" class="btn" style="background-color: #475569; min-width: 140px;">파일 재생성 (chain 등)</button>
+        {% if action == 'test_issue' and cert.is_acme %}
+            <button id="start-deploy" class="btn" style="background-color: #10b981; min-width: 140px;">테스트 배포 시작</button>
+        {% endif %}
+        <button id="stop-action" class="btn" style="background-color: #ef4444; display: none; min-width: 100px;">작업 중단</button>
+    </div>
+</div>
+
+<div class="card">
+    <h3 style="margin-top: 0;">{% trans "Live execution log" %}</h3>
+    <div id="log-container" data-is-acme="{{ cert.is_acme|yesno:'true,false' }}" style="background: #0f172a; color: #38bdf8; padding: 20px; border-radius: 4px; font-family: monospace; height: 400px; overflow-y: auto;">
+        {% if cert.is_acme %}
+        <div>{% trans "Click the button above to start." %}</div>
+        {% else %}
+        <div style="color: #fbbf24; font-weight: bold;">⚠ {% trans "This is a manual certificate. Issuance and renewal are disabled." %}</div>
+        <div style="color: #fbbf24;">{% trans "To renew, go to Edit and upload a new ZIP file for manual renewal." %}</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    (function() {
+        function initWebSocketAction() {
+            const logContainer = document.getElementById('log-container');
+            const startBtn = document.getElementById('start-action');
+            if (!startBtn || startBtn.dataset.initialized) return;
+            
+            startBtn.dataset.initialized = "true";
+
+            const certId = "{{ cert.id }}";
+            const action = "{{ action }}";
+            const title = "{{ title }}";
+            const isAcme = (logContainer.dataset.isAcme === 'true');
+            // 수동 인증서 안내 메시지 (i18n) — JS에서 가드 시 사용
+            const manualBlockedMsg = "{% trans 'Issuance and renewal are disabled for manual certificates. To renew, go to Edit and upload a new ZIP file for manual renewal.' %}";
+
+            function showManualBlocked() {
+                const div = document.createElement('div');
+                div.style.color = '#fbbf24';
+                div.style.fontWeight = 'bold';
+                div.textContent = '⚠ ' + manualBlockedMsg;
+                logContainer.appendChild(div);
+                logContainer.scrollTop = logContainer.scrollHeight;
+            }
+            const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+            const socketUrl = `${protocol}://${window.location.host}/ws/cert/acme_action/${certId}/`;
+            
+            let socket = null;
+            const stopBtn = document.getElementById('stop-action');
+            const startDeployBtn = document.getElementById('start-deploy');
+
+            function connect() {
+                if (socket && (socket.readyState === WebSocket.OPEN || socket.readyState === WebSocket.CONNECTING)) return;
+                
+                socket = new WebSocket(socketUrl);
+
+                socket.onopen = function() {
+                    logContainer.innerHTML += '<div style="color: #64748b;">[시스템] 서버와 연결되었습니다.</div>';
+                };
+
+                socket.onmessage = function(e) {
+                    const data = JSON.parse(e.data);
+                    if (data.type === 'log') {
+                        const div = document.createElement('div');
+                        div.textContent = `[${new Date().toLocaleTimeString()}] ${data.message}`;
+                        logContainer.appendChild(div);
+                        logContainer.scrollTop = logContainer.scrollHeight;
+                    } else if (data.type === 'status') {
+                        resetButtons();
+                        if (data.status === 'success') {
+                            logContainer.innerHTML += '<div style="color: #10b981; font-weight: bold; margin-top: 10px;">[시스템] 작업 성공! 모든 프로세스가 완료되었습니다.</div>';
+                        }
+                    }
+                };
+
+                socket.onclose = function() {
+                };
+            }
+
+            const checkCnameBtn = document.getElementById('check-cname');
+            if (checkCnameBtn) {
+                checkCnameBtn.onclick = function() {
+                    fetch("{% url 'core_cert:get_cname_info' cert.pk %}")
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.error) {
+                                alert(data.error);
+                            } else {
+                                const html = `
+<div style="color: #fbbf24; background: rgba(251, 191, 36, 0.1); padding: 15px; border-radius: 8px; border: 1px solid #fbbf24; margin-top: 15px;">
+    <div style="font-weight: bold; margin-bottom: 10px; border-bottom: 1px solid rgba(251, 191, 36, 0.3); padding-bottom: 5px;">DNS CNAME 설정 정보</div>
+    
+    ${data.is_placeholder ? `<div style="background: #991b1b; color: white; padding: 5px 10px; border-radius: 4px; font-size: 0.8rem; margin-bottom: 10px;">주의: ACME-DNS 도메인이 설정되지 않아 예시(auth.example.com)로 표시됩니다. [설정] 메뉴에서 실제 도메인을 입력하세요.</div>` : ''}
+
+    <div style="margin-bottom: 12px;">
+        <div style="font-size: 0.8rem; opacity: 0.8;">호스트 (Name)</div>
+        <div style="display: flex; gap: 10px; align-items: center; margin-top: 4px;">
+            <code style="flex-grow: 1; background: #000; padding: 6px 10px; border-radius: 4px; color: #fff;">${data.domain}</code>
+            <button onclick="copyToClipboard('${data.domain}', this)" class="btn" style="padding: 4px 10px; font-size: 0.75rem; background: #fbbf24; color: #000;">복사</button>
+        </div>
+    </div>
+    
+    <div style="margin-bottom: 5px;">
+        <div style="font-size: 0.8rem; opacity: 0.8;">대상 (Value/Target)</div>
+        <div style="display: flex; gap: 10px; align-items: center; margin-top: 4px;">
+            <code style="flex-grow: 1; background: #000; padding: 6px 10px; border-radius: 4px; color: #fff;">${data.cname_target}</code>
+            <button onclick="copyToClipboard('${data.cname_target}', this)" class="btn" style="padding: 4px 10px; font-size: 0.75rem; background: #fbbf24; color: #000;">복사</button>
+        </div>
+    </div>
+    <div style="font-size: 0.75rem; margin-top: 10px; opacity: 0.7;">* DNS 관리 페이지에서 위 레코드를 추가한 뒤 발급을 다시 시작하세요.</div>
+</div>`;
+                                logContainer.innerHTML += html;
+                                logContainer.scrollTop = logContainer.scrollHeight;
+                            }
+                        })
+                        .catch(err => {
+                            console.error("CNAME 조회 실패:", err);
+                            alert("정보를 불러오지 못했습니다. 발급을 먼저 시도해야 정보가 생성됩니다.");
+                        });
+                };
+            }
+
+            const regenBtn = document.getElementById('regen-files');
+            if (regenBtn) {
+                regenBtn.onclick = function() {
+                    regenBtn.disabled = true;
+                    const orig = regenBtn.textContent;
+                    regenBtn.textContent = '재생성 중...';
+                    fetch("{% url 'core_cert:regenerate_cert_files' cert.pk %}", {
+                        method: 'POST',
+                        headers: { 'X-CSRFToken': getCsrfToken() },
+                        credentials: 'same-origin'
+                    })
+                        .then(response => {
+                            // 403 등으로 HTML이 오면 .json()이 깨지므로 상태/콘텐츠타입을 먼저 확인
+                            if (!response.ok) {
+                                throw new Error(`서버 응답 ${response.status} (권한 또는 세션 문제일 수 있습니다)`);
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data.error) {
+                                alert(data.error);
+                            } else {
+                                const rows = (data.results || []).map(r =>
+                                    `<div style="display:flex; gap:8px; align-items:center; margin:3px 0;">
+                                        <span style="color:${r.ok ? '#22c55e' : '#ef4444'};">${r.ok ? '✓' : '✗'}</span>
+                                        <span style="opacity:0.8; min-width:160px;">${r.label}</span>
+                                        <code style="background:#000; padding:2px 8px; border-radius:4px; color:#fff;">${r.file}</code>
+                                    </div>`).join('');
+                                const html = `
+<div style="color: #93c5fd; background: rgba(59,130,246,0.1); padding: 15px; border-radius: 8px; border: 1px solid #3b82f6; margin-top: 15px;">
+    <div style="font-weight: bold; margin-bottom: 10px; border-bottom: 1px solid rgba(59,130,246,0.3); padding-bottom: 5px;">파일 재생성 결과</div>
+    ${rows}
+    <div style="font-size: 0.75rem; margin-top: 10px; opacity: 0.7;">* 발급된 원본 인증서를 기준으로 chain / RootCA / pfx 파일을 새로 만들었습니다. (ZeroSSL은 구형 기기용 cross-sign 변형 포함)</div>
+</div>`;
+                                logContainer.innerHTML += html;
+                                logContainer.scrollTop = logContainer.scrollHeight;
+                            }
+                        })
+                        .catch(err => {
+                            console.error("파일 재생성 실패:", err);
+                            alert("파일 재생성에 실패했습니다. 인증서를 먼저 발급했는지 확인하세요.");
+                        })
+                        .finally(() => {
+                            regenBtn.disabled = false;
+                            regenBtn.textContent = orig;
+                        });
+                };
+            }
+
+            function getCsrfToken() {
+                // 1순위: 페이지에 렌더된 hidden input (가장 확실)
+                const el = document.querySelector('[name=csrfmiddlewaretoken]');
+                if (el && el.value) return el.value;
+                // 2순위: 쿠키 (이 프로젝트는 커스텀 쿠키명 사용 — settings.CSRF_COOKIE_NAME)
+                const m = document.cookie.match(/(?:^|;\s*)(?:Agncert_csrftoken|csrftoken)=([^;]+)/);
+                return m ? decodeURIComponent(m[1]) : '';
+            }
+
+            window.copyToClipboard = function(text, btn) {
+                const originalText = btn.textContent;
+                
+                function showSuccess() {
+                    btn.textContent = '완료!';
+                    btn.style.background = '#10b981';
+                    btn.style.color = '#fff';
+                    setTimeout(() => {
+                        btn.textContent = originalText;
+                        btn.style.background = '#fbbf24';
+                        btn.style.color = '#000';
+                    }, 2000);
+                }
+
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard.writeText(text).then(showSuccess);
+                } else {
+                    // Fallback for non-HTTPS
+                    const textArea = document.createElement("textarea");
+                    textArea.value = text;
+                    textArea.style.position = "fixed";
+                    textArea.style.left = "-999999px";
+                    textArea.style.top = "-999999px";
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+                    try {
+                        document.execCommand('copy');
+                        showSuccess();
+                    } catch (err) {
+                        console.error('Fallback 복사 실패', err);
+                    }
+                    document.body.removeChild(textArea);
+                }
+            };
+
+            function resetButtons() {
+                startBtn.disabled = false;
+                startBtn.style.opacity = '1';
+                startBtn.textContent = `${title} 시작`;
+                if (startDeployBtn) {
+                    startDeployBtn.disabled = false;
+                    startDeployBtn.style.opacity = '1';
+                    startDeployBtn.textContent = '테스트 배포 시작';
+                }
+                stopBtn.style.display = 'none';
+            }
+
+            startBtn.onclick = function() {
+                // 안전장치: 수동 인증서는 발급/갱신 불가 — 서버로 보내지 않고 안내만 표시
+                if (!isAcme) { showManualBlocked(); return; }
+                if (!socket || socket.readyState !== WebSocket.OPEN) {
+                    connect();
+                    setTimeout(() => startBtn.click(), 500);
+                    return;
+                }
+                startBtn.disabled = true;
+                startBtn.style.opacity = '0.5';
+                startBtn.textContent = '처리 중...';
+                stopBtn.style.display = 'inline-block';
+                socket.send(JSON.stringify({ 'action': action }));
+            };
+
+            if (startDeployBtn) {
+                startDeployBtn.onclick = function() {
+                    if (!isAcme) { showManualBlocked(); return; }
+                    if (!socket || socket.readyState !== WebSocket.OPEN) {
+                        connect();
+                        setTimeout(() => startDeployBtn.click(), 500);
+                        return;
+                    }
+                    startDeployBtn.disabled = true;
+                    startDeployBtn.style.opacity = '0.5';
+                    startDeployBtn.textContent = '배포 중...';
+                    socket.send(JSON.stringify({ 'action': 'deploy_only' }));
+                };
+            }
+
+            stopBtn.onclick = function() {
+                if (socket && socket.readyState === WebSocket.OPEN) {
+                    socket.send(JSON.stringify({ 'action': 'stop' }));
+                }
+            };
+
+            connect();
+        }
+
+        // HTMX 로드 시 및 일반 로드 시 모두 대응
+        document.addEventListener('htmx:afterSettle', initWebSocketAction);
+        initWebSocketAction();
+    })();
+</script>
+{% endblock %}

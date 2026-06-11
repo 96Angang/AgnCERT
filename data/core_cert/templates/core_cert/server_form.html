@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% if object %}{% trans "Edit Server" %}{% else %}{% trans "Add Server" %}{% endif %} - AgnCERT{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+    <h2 style="margin: 0;">
+        {% if object %}
+            {% trans "Edit Server" %}: {{ object.name }}
+        {% else %}
+            {% trans "Register New Target Server" %}
+        {% endif %}
+    </h2>
+    <a href="{% url 'core_cert:server_list' %}" class="btn btn-outline-secondary">{% trans "Back to List" %}</a>
+</div>
+
+<div class="card">
+    <form method="post" style="display: grid; gap: 20px;">
+        {% csrf_token %}
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="field-wrapper">
+                <label class="field-label">{% trans "Server Name" %}</label>
+                {{ form.name }}
+            </div>
+            <div class="field-wrapper">
+                <label class="field-label">{% trans "IP Address" %}</label>
+                {{ form.ip_address }}
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="field-wrapper">
+                <label class="field-label">{% trans "SSH User" %}</label>
+                {{ form.ssh_user }}
+            </div>
+            <div class="field-wrapper">
+                <label class="field-label">{% trans "SSH Port" %}</label>
+                {{ form.ssh_port }}
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="field-wrapper">
+                <label class="field-label">{% trans "OS Type" %}</label>
+                {{ form.os_type }}
+            </div>
+            <div class="field-wrapper">
+                <label class="field-label">{% trans "Web Server" %}</label>
+                {{ form.web_server_type }}
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="field-wrapper">
+                <label class="field-label">{% trans "Path Mode" %}</label>
+                {{ form.path_type }}
+            </div>
+            <div class="field-wrapper" id="custom-path-wrapper">
+                <label class="field-label">{% trans "Custom Path" %}</label>
+                {{ form.custom_path }}
+            </div>
+        </div>
+
+        <div class="field-wrapper" id="ssl-config-wrapper">
+            <label class="field-label">{% trans "SSL Config File Path" %}</label>
+            {{ form.ssl_config_path }}
+            <small class="text-muted">{% trans "For site test verification. e.g., /etc/httpd/conf.d/ssl.conf" %}</small>
+        </div>
+
+        <div style="margin-top: 10px; display: flex; gap: 12px;">
+            <button type="submit" class="btn btn-primary" style="padding: 10px 30px;">{% trans "Save" %}</button>
+            <a href="{% url 'core_cert:server_list' %}" class="btn btn-outline-secondary" style="padding: 10px 30px;">{% trans "Cancel" %}</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    (function() {
+        // OS별 허용 웹서버 종류 (안전장치: Windows=IIS/없음, Linux=Nginx/Apache/없음)
+        const ALLOWED_WEB = {
+            windows: ['none', 'iis'],
+            linux: ['none', 'nginx', 'apache'],
+        };
+
+        function filterWebServer() {
+            const osType = document.querySelector('select[name="os_type"]');
+            const web = document.querySelector('select[name="web_server_type"]');
+            if (!osType || !web) return;
+            const allowed = ALLOWED_WEB[osType.value] || ['none'];
+            let currentOk = false;
+            Array.from(web.options).forEach(opt => {
+                const ok = allowed.includes(opt.value);
+                opt.hidden = !ok;
+                opt.disabled = !ok;
+                if (ok && opt.value === web.value) currentOk = true;
+            });
+            // 현재 선택값이 이 OS에서 허용되지 않으면 첫 허용값(none)으로 보정
+            if (!currentOk) web.value = allowed[0];
+        }
+
+        function toggleServerFields() {
+            const pathType = document.querySelector('select[name="path_type"]');
+            const osType = document.querySelector('select[name="os_type"]');
+            const customWrap = document.getElementById('custom-path-wrapper');
+            const sslWrap = document.getElementById('ssl-config-wrapper');
+
+            filterWebServer();
+
+            // 경로 모드가 '사용자 정의'일 때만 Custom Path 표시
+            if (pathType && customWrap) {
+                customWrap.style.display = (pathType.value === 'custom') ? '' : 'none';
+            }
+            // SSL 설정 파일 경로는 Linux 웹서버 검증용 — Windows에서는 숨김
+            if (osType && sslWrap) {
+                sslWrap.style.display = (osType.value === 'windows') ? 'none' : '';
+            }
+        }
+
+        function init() {
+            const pathType = document.querySelector('select[name="path_type"]');
+            const osType = document.querySelector('select[name="os_type"]');
+            if (pathType) pathType.addEventListener('change', toggleServerFields);
+            if (osType) osType.addEventListener('change', toggleServerFields);
+            toggleServerFields();
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+        init();
+    })();
+</script>
+{% endblock %}

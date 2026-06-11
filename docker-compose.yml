@@ -1,0 +1,53 @@
+services:
+  cert:
+    build: .
+    container_name: django_AgnCert
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app
+      - django_static:/app/staticfiles
+    working_dir: /app
+    entrypoint: ["/bin/bash", "/app/entrypoint.sh"]
+    env_file:
+      - data/.env
+    environment:
+      - PYTHONUNBUFFERED=1
+      - DJANGO_PORT=8000
+      - C_FORCE_ROOT=true
+    restart: always
+    depends_on:
+      - mariadb
+      - valkey
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx_AgnCert
+    ports:
+      - "18180:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - django_static:/usr/share/nginx/html/static:ro
+    restart: always
+    depends_on:
+      - cert
+
+  mariadb:
+    image: mariadb:11.4
+    container_name: mariadb_AgnCert
+    restart: always
+    # DB 자격증명은 data/.env 의 MARIADB_* / MARIADB_DATABASE 변수에서 주입
+    env_file:
+      - data/.env
+    volumes:
+      - ./mariadb_data:/var/lib/mysql
+
+  valkey:
+    image: valkey/valkey:8.0
+    container_name: valkey_AgnCert
+    restart: always
+    volumes:
+      - ./valkey_data:/data
+
+volumes:
+  django_static:

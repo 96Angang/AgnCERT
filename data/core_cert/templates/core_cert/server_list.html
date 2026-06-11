@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Server Management" %} - AgnCERT{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+    <h2 style="margin: 0;">{% trans "Server Management" %}</h2>
+    <div style="display: flex; gap: 12px; align-items: center;">
+        <div id="bulk-server-actions" style="display: none; gap: 8px;">
+            <span style="font-size: 0.85rem; color: var(--bs-secondary-color); font-weight: 600;" id="selected-count">0 {% trans "selected" %}</span>
+            <button type="button" class="btn btn-sm btn-outline-danger" onclick="submitBulkServerAction('delete')">{% trans "Delete" %}</button>
+            <button type="button" class="btn btn-sm btn-primary" onclick="submitBulkServerAction('test')">{% trans "Site Test" %}</button>
+        </div>
+        <a href="{% url 'core_cert:server_add' %}" class="btn btn-primary">{% trans "Add Server" %}</a>
+    </div>
+</div>
+
+<div class="card" style="padding: 0; overflow: hidden;">
+    <form id="bulk-server-form" action="{% url 'core_cert:bulk_server_delete' %}" method="post">
+        {% csrf_token %}
+        <table style="margin: 0; width: 100%;">
+            <thead>
+                <tr style="border-bottom: 1px solid var(--bs-border-color);">
+                    <th style="width: 40px; text-align: center; padding-left: 15px;">
+                        <input type="checkbox" id="select-all-servers" style="cursor: pointer;">
+                    </th>
+                    <th style="padding: 15px;"><a href="?sort=name" style="color: var(--bs-heading-color); text-decoration: none; display: flex; align-items: center; gap: 5px;">{% trans "Server Name" %} {% if current_sort == 'name' %}<i class="bi bi-sort-alpha-down"></i>{% endif %}</a></th>
+                    <th style="color: var(--bs-heading-color);"><a href="?sort=ip" style="color: var(--bs-heading-color); text-decoration: none; display: flex; align-items: center; gap: 5px;">{% trans "IP / SSH" %} {% if current_sort == 'ip' %}<i class="bi bi-sort-numeric-down"></i>{% endif %}</a></th>
+                    <th style="color: var(--bs-heading-color);"><a href="?sort=os" style="color: var(--bs-heading-color); text-decoration: none; display: flex; align-items: center; gap: 5px;">{% trans "OS / WebServer" %} {% if current_sort == 'os' %}<i class="bi bi-sort-down"></i>{% endif %}</a></th>
+                    <th style="color: var(--bs-heading-color);">{% trans "SSH Status" %}</th>
+                    <th style="text-align: right; padding-right: 20px; color: var(--bs-heading-color);">{% trans "Actions" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for server in servers %}
+                <tr style="border-bottom: 1px solid var(--bs-border-color);">
+                    <td style="text-align: center; padding-left: 15px;">
+                        <input type="checkbox" name="server_ids" value="{{ server.pk }}" class="server-checkbox" style="cursor: pointer;">
+                    </td>
+                    <td style="padding: 15px;">
+                        <strong style="font-size: 1.05rem; color: var(--bs-heading-color);">{{ server.name }}</strong>
+                        {% if server.description %}
+                            <div style="font-size: 0.8rem; color: var(--bs-secondary-color);">{{ server.description }}</div>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div style="color: var(--bs-body-color);">{{ server.ip_address }}</div>
+                        <small style="color: var(--bs-secondary-color);">{{ server.ssh_user }} ({{ server.ssh_port }})</small>
+                    </td>
+                    <td>
+                        <span class="badge" style="background: rgba(0,0,0,0.1); border: 1px solid var(--bs-border-color); color: var(--bs-body-color);">{{ server.get_os_type_display }}</span>
+                        <span class="badge" style="background: rgba(0,0,0,0.1); border: 1px solid var(--bs-border-color); color: var(--bs-body-color);">{{ server.get_web_server_type_display }}</span>
+                    </td>
+                    <td>
+                        {% if server.ssh_status == 'success' %}
+                            <span class="badge badge-success">{% trans "Connected" %}</span>
+                        {% elif server.ssh_status == 'failure' %}
+                            <span class="badge badge-error" title="{{ server.ssh_error }}">{% trans "Failed" %}</span>
+                        {% else %}
+                            <span class="badge" style="background: rgba(0,0,0,0.1); color: var(--bs-secondary-color);">{% trans "Pending" %}</span>
+                        {% endif %}
+                    </td>
+                    <td style="text-align: right; padding-right: 20px;">
+                        <div style="display: flex; gap: 8px; justify-content: flex-end; align-items: center; flex-wrap: wrap;">
+                            <a href="{% url 'core_cert:server_ssh_setup' server.pk %}" class="btn" style="background-color: #64748b; color: white; padding: 4px 8px; font-size: 0.8rem;" title="{% trans "Setup SSH public key on target server" %}">{% trans "Keys" %}</a>
+                            <a href="{% url 'core_cert:test_ssh_connection' server.pk %}" class="btn" style="background-color: #3b82f6; color: white; padding: 4px 8px; font-size: 0.8rem;" title="{% trans "SSH connection test" %}">{% trans "SSH Test" %}</a>
+                            <button type="button" class="btn" style="background-color: #6366f1; color: white; padding: 4px 8px; font-size: 0.8rem;" onclick="testSiteCertificates(['{{ server.pk }}'], '{{ server.name }}')" title="{% trans "Site certificate verification" %}">{% trans "Site Test" %}</button>
+                            <a href="{% url 'core_cert:server_edit' server.pk %}" class="btn" style="background-color: #94a3b8; color: white; padding: 4px 8px; font-size: 0.8rem;">{% trans "Edit" %}</a>
+                            <a href="{% url 'core_cert:server_delete' server.pk %}" class="btn" style="background-color: var(--error); color: white; padding: 4px 8px; font-size: 0.8rem;">{% trans "Delete" %}</a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="text-align: center; padding: 40px; color: var(--bs-secondary-color);">{% trans "No servers registered." %}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </form>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    (function() {
+        const selectAll = document.getElementById('select-all-servers');
+        const checkboxes = document.querySelectorAll('.server-checkbox');
+        const bulkActionDiv = document.getElementById('bulk-server-actions');
+        const selectedCountSpan = document.getElementById('selected-count');
+        const form = document.getElementById('bulk-server-form');
+
+        if (selectAll && bulkActionDiv) {
+            function updateBulkActionVisibility() {
+                const checkedCount = document.querySelectorAll('.server-checkbox:checked').length;
+                bulkActionDiv.style.display = checkedCount > 0 ? 'flex' : 'none';
+                if (selectedCountSpan) selectedCountSpan.innerText = `${checkedCount} {% trans "selected" %}`;
+            }
+
+            selectAll.onchange = function() {
+                checkboxes.forEach(cb => cb.checked = selectAll.checked);
+                updateBulkActionVisibility();
+            };
+
+            checkboxes.forEach(cb => {
+                cb.onchange = updateBulkActionVisibility;
+            });
+
+            window.submitBulkServerAction = function(type) {
+                const checkedBoxes = document.querySelectorAll('.server-checkbox:checked');
+                if (checkedBoxes.length === 0) return;
+                
+                if (type === 'delete') {
+                    if (confirm(`{% trans "Are you sure you want to delete selected " %}${checkedBoxes.length}{% trans " servers? Connected deployment scripts may be affected." %}`)) {
+                        form.submit();
+                    }
+                } else if (type === 'test') {
+                    const ids = Array.from(checkedBoxes).map(cb => cb.value);
+                    testSiteCertificates(ids, `{% trans "Selected servers" %}`);
+                }
+            };
+        }
+
+        window.testSiteCertificates = function(serverPks, titleLabel) {
+            showAlert(`{% trans "Verifying sites..." %}`, `<div style="text-align: center; padding: 20px;"><div class="spinner-border text-primary" role="status"></div><p style="margin-top: 15px;">{% trans "Analyzing and verifying domains on " %}${titleLabel}...<br><small class="text-muted">{% trans "May take several minutes depending on the number of servers." %}</small></p></div>`);
+            
+            const params = new URLSearchParams();
+            serverPks.forEach(id => params.append('server_ids', id));
+
+            fetch(`/servers/test-sites-bulk/?${params.toString()}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        showAlert('{% trans "Error" %}', data.error);
+                        return;
+                    }
+
+                    let html = `<div style="text-align: left; max-height: 500px; overflow-y: auto;">`;
+                    
+                    for (const [serverName, results] of Object.entries(data.results)) {
+                        html += `<div style="margin-bottom: 20px;">
+                            <h6 style="font-weight: bold; border-left: 4px solid #6366f1; padding-left: 8px; margin-bottom: 10px; color: var(--bs-heading-color);">${serverName}</h6>`;
+                        
+                        if (results.length > 0) {
+                            html += `<table class="table table-sm" style="font-size: 0.8rem; margin-bottom: 0;">
+                                <thead>
+                                    <tr style="background: var(--bs-tertiary-bg);">
+                                        <th style="color: var(--bs-heading-color);">{% trans "Domain" %}</th>
+                                        <th style="width: 60px; text-align: center; color: var(--bs-heading-color);">{% trans "Port" %}</th>
+                                        <th style="color: var(--bs-heading-color);">{% trans "Status" %}</th>
+                                        <th style="color: var(--bs-heading-color);">{% trans "Expiry (Site)" %}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>`;
+                            
+                            results.forEach(res => {
+                                let statusBadge = '';
+                                const statusText = res.status_text || (res.match ? '{% trans "Match" %}' : '{% trans "Mismatch" %}');
+
+                                if (res.match) {
+                                    statusBadge = `<span class="badge badge-success">{% trans "Match" %}</span>`;
+                                } else if (statusText === '{% trans "Unmanaged" %}' || res.is_managed === false) {
+                                    statusBadge = `<span class="badge" style="background: rgba(0,0,0,0.1); color: var(--bs-secondary-color); border: 1px solid var(--bs-border-color);">{% trans "Unmanaged" %}</span>`;
+                                } else if (!res.match) {
+                                    statusBadge = `<span class="badge badge-warning">{% trans "Mismatch" %}</span>`;
+                                } else {
+                                    statusBadge = `<span class="badge badge-error">{% trans "Error" %}</span>`;
+                                }
+                                
+                                const rowStyle = res.is_managed ? (res.match ? '' : 'background-color: rgba(255, 249, 219, 0.1);') : 'opacity: 0.8;';
+                                
+                                html += `<tr style="${rowStyle}">
+                                    <td>
+                                        <strong style="color: var(--bs-heading-color);">${res.domain}</strong>
+                                        ${res.is_managed ? '' : '<br><small class="text-muted" style="font-size: 0.7rem;">({% trans "Not in system" %})</small>'}
+                                    </td>
+                                    <td style="text-align: center;"><code style="background: rgba(0,0,0,0.2); padding: 2px 4px; border-radius: 3px; font-size: 0.75rem; color: var(--bs-info-text-emphasis); border: 1px solid var(--bs-border-color);">${res.port || 443}</code></td>
+                                    <td>${statusBadge}</td>
+                                    <td><small style="color: var(--bs-body-color);">${res.expiry_date || '-'}</small></td>
+                                </tr>`;
+                                if (res.error) {
+                                    html += `<tr><td colspan="4" style="border-top:none; padding-top:0;"><small class="text-danger">↳ ${res.error}</small></td></tr>`;
+                                }
+                            });
+                            html += `</tbody></table>`;
+                        } else {
+                            html += `<p style="font-size: 0.8rem; color: var(--bs-secondary-color); margin-left: 15px;">{% trans "No domains found." %}</p>`;
+                        }
+                        html += `</div>`;
+                    }
+                    
+                    html += `<div style="margin-top: 15px; padding: 12px; border-top: 1px dashed var(--bs-border-color); font-size: 0.8rem; color: var(--bs-secondary-color); text-align: left;">
+                                <i class="bi bi-info-circle me-1"></i> 
+                                {% trans "To exclude a domain from this list, add the following comment in its config block (VirtualHost or server):" %}
+                                <code style="background: rgba(0,0,0,0.2); padding: 2px 5px; border-radius: 4px; color: var(--bs-info-text-emphasis);"># AgnCERT_except=true</code>
+                             </div>
+                    </div>`;
+                    showAlert(`${titleLabel} {% trans "Integrated Verification Result" %}`, html);
+                })
+                .catch(err => {
+                    showAlert('{% trans "Error" %}', '{% trans "A communication error occurred during verification." %}');
+                });
+        };
+    })();
+</script>
+{% endblock %}

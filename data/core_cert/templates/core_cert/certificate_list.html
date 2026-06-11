@@ -1,0 +1,230 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Certificates & Deployment" %} - AgnCERT{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+    <h2 style="margin: 0;">{% trans "Certificate & Deployment Management" %}</h2>
+    <div style="display: flex; gap: 8px;">
+        <a href="{% url 'core_cert:certificate_sync' %}" class="btn btn-outline-secondary">{% trans "Full Sync & Auto Hook" %}</a>
+        <a href="{% url 'core_cert:certificate_add' %}" class="btn btn-primary">{% trans "Add Certificate" %}</a>
+    </div>
+</div>
+
+<!-- 자동 갱신 스케줄 상태 -->
+<div class="card" style="background-color: rgba(14, 165, 233, 0.1); border: 1px solid rgba(14, 165, 233, 0.2); display: flex; justify-content: space-between; align-items: center; padding: 15px 24px; margin-bottom: 20px;">
+    <div style="display: flex; align-items: center; gap: 15px;">
+        <div style="font-size: 1.5rem;"><i class="bi bi-clock-history"></i></div>
+        <div>
+            <strong style="color: var(--bs-info-text-emphasis); display: block; margin-bottom: 2px;">{% trans "Auto Renewal & Deployment Schedule" %}</strong>
+            <div style="font-size: 0.9rem; color: var(--bs-body-color); display: flex; align-items: center; gap: 15px;">
+                <span>{% trans "Last Check" %}: <strong>{{ global_settings.LAST_CRON_RENEWAL|slice:":19"|default:_("No Record") }}</strong></span>
+                <span style="background: rgba(14, 165, 233, 0.2); color: var(--bs-info-text-emphasis); padding: 2px 8px; border-radius: 20px; font-weight: 600; font-size: 0.8rem;">
+                    {% trans "Next run in" %}: {{ next_renewal_remaining }}
+                </span>
+                <form action="{% url 'core_cert:save_global_settings' %}" method="post" style="display: flex; align-items: center; gap: 5px;">
+                    {% csrf_token %}
+                    <input type="hidden" name="key" value="RENEWAL_TIME">
+                    <label style="font-weight: normal; margin: 0;">{% trans "Time" %}:</label>
+                    <input type="text" name="value" value="{{ global_settings.RENEWAL_TIME|default:'03:00' }}" class="form-control form-control-sm" style="width: 70px; padding: 2px 5px; font-size: 0.85rem;" placeholder="03:00">
+                    <button type="submit" class="btn" style="padding: 2px 8px; font-size: 0.75rem; background-color: #64748b; color: white;">{% trans "Set" %}</button>
+                </form>
+                <form action="{% url 'core_cert:save_global_settings' %}" method="post" style="display: flex; align-items: center; gap: 5px;">
+                    {% csrf_token %}
+                    <input type="hidden" name="key" value="RENEWAL_DAYS_BEFORE">
+                    <label style="font-weight: normal; margin: 0;">{% trans "Renewal D-Day" %}:</label>
+                    <input type="number" name="value" value="{{ global_settings.RENEWAL_DAYS_BEFORE|default:'30' }}" class="form-control form-control-sm" style="width: 50px; padding: 2px 5px; font-size: 0.85rem;" placeholder="30">
+                    <button type="submit" class="btn" style="padding: 2px 8px; font-size: 0.75rem; background-color: #64748b; color: white;">{% trans "Set" %}</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <a href="{% url 'core_cert:cron_renew_trigger' %}" class="btn" style="background-color: #0ea5e9; color: white; font-size: 0.85rem;" onclick="return confirm('{% trans "Check all certificates for renewal and perform deployment now? (May take several minutes)" %}')">{% trans "Run Check Now" %}</a>
+</div>
+
+<div class="card" style="padding: 0; overflow: hidden;">
+    <table style="margin: 0; width: 100%; table-layout: fixed;">
+        <colgroup>
+            <col style="width: 30%;">
+            <col style="width: 140px;">
+            <col style="min-width: 0; width: auto;">
+            <col style="width: 196px;">
+        </colgroup>
+        <thead>
+            <tr style="border-bottom: 1px solid var(--bs-border-color);">
+                <th style="padding: 15px; color: var(--bs-heading-color);">{% trans "Domain" %}</th>
+                <th style="color: var(--bs-heading-color);">{% trans "Status (Expiry)" %}</th>
+                <th style="color: var(--bs-heading-color);">{% trans "Scripts & Servers" %}</th>
+                <th style="text-align: right; padding-right: 20px; color: var(--bs-heading-color);">{% trans "Actions" %}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cert in certs %}
+            <tr style="border-bottom: 1px solid var(--bs-border-color);">
+                <td style="padding: 15px;">
+                    <div style="display: flex; align-items: center; gap: 6px; min-width: 0;">
+                        <strong style="font-size: 1rem; color: var(--bs-heading-color); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; flex: 1;" title="{% if cert.name %}{{ cert.name }}{% else %}{{ cert.domain }}{% endif %}">{% if cert.name %}{{ cert.name }}{% else %}{{ cert.domain }}{% endif %}</strong>
+                        <button type="button" class="btn flex-shrink-0" style="padding: 1px 6px; font-size: 0.7rem; background-color: #6366f1; color: white; white-space: nowrap;" onclick="showDnsChallenge('{{ cert.pk }}', '{{ cert.domain }}')">
+                            CNAME
+                        </button>
+                    </div>
+                    {% if cert.name %}
+                    <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.82rem; color: var(--bs-secondary-color); margin-top: 1px;" title="{{ cert.domain }}">{{ cert.domain }}</div>
+                    {% endif %}
+                    <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px;">
+                        {% if cert.cert_type == 'manual' %}
+                            <span class="badge" style="background: rgba(148, 163, 184, 0.2); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.4); font-size: 0.7rem;">{% trans "Manual" %}</span>
+                        {% elif cert.ca_server == 'letsencrypt_test' %}
+                            <span class="badge" style="background: rgba(248, 113, 113, 0.2); color: #f87171; border: 1px solid rgba(248, 113, 113, 0.4); font-size: 0.7rem;">{% trans "Staging" %}</span>
+                        {% else %}
+                            <span class="badge" style="background: rgba(74, 222, 128, 0.2); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.4); font-size: 0.7rem;">{{ cert.ca_server|capfirst }}</span>
+                        {% endif %}
+                        {% if cert.is_wildcard %}
+                            <span class="badge" style="background: rgba(251, 191, 36, 0.2); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.4); font-size: 0.7rem;">{% trans "Wildcard" %}</span>
+                        {% endif %}
+                        {% if cert.key_type and cert.key_type != 'ec-256' %}
+                            <span class="badge" style="background: rgba(139, 92, 246, 0.2); color: #a78bfa; border: 1px solid rgba(139, 92, 246, 0.4); font-size: 0.7rem;">{{ cert.key_type|upper }}</span>
+                        {% endif %}
+                    </div>
+                    {% if cert.allowed_domains %}
+                    <div style="margin-top: 6px; font-size: 0.78rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--bs-info-text-emphasis);" title="{{ cert.allowed_domains }}">
+                        <code style="background: rgba(0,0,0,0.2); padding: 1px 4px; border-radius: 3px; font-size: inherit;">{{ cert.allowed_domains }}</code>
+                    </div>
+                    {% endif %}
+                </td>
+                <td style="vertical-align: top; padding-top: 15px;">
+                    {% if cert.expiry_date %}
+                        <div style="white-space: nowrap; margin-bottom: 3px;">
+                            <span style="color: var(--bs-secondary-color); font-size: 0.75rem;">{% trans "Expiry" %}</span><br>
+                            <span style="font-weight: 600; font-size: 0.9rem; color: {% if cert.status == 'valid' %}#4ade80{% else %}#f87171{% endif %};">
+                                {{ cert.expiry_date|date:"Y-m-d" }}
+                            </span>
+                        </div>
+                        <div style="white-space: nowrap; margin-bottom: 3px;">
+                            <span style="color: var(--bs-secondary-color); font-size: 0.75rem;">{% trans "Renewal" %}</span><br>
+                            <span style="font-weight: 600; font-size: 0.9rem; color: var(--bs-info-text-emphasis);">
+                                {{ cert.renewal_date|date:"Y-m-d" }}
+                            </span>
+                        </div>
+                        <small style="color: var(--bs-secondary-color); font-size: 0.75rem;">{{ cert.get_status_display|default:cert.status }}</small>
+                    {% else %}
+                        <span style="color: var(--bs-secondary-color);">{% trans "No Info" %}</span>
+                    {% endif %}
+                </td>
+                <td style="vertical-align: top; padding: 15px 10px 15px 0;">
+                    {% for script in cert.deploy_scripts.all %}
+                        <div style="margin-bottom: 6px; min-width: 0;">
+                            <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--bs-heading-color); font-weight: 500; font-size: 0.88rem;" title="{{ script.name }}">{{ script.name }}</div>
+                            <div style="margin-left: 10px;">
+                                {% for target in script.deployment_targets.all %}
+                                    <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.8rem; color: var(--bs-secondary-color);" title="{{ target.server.name }} ({{ target.server.ip_address }})">
+                                        {% if target.server.ssh_status == 'success' %}
+                                            <i class="bi bi-circle-fill" style="color: #10b981; font-size: 0.45rem; vertical-align: middle;"></i>
+                                        {% else %}
+                                            <i class="bi bi-circle-fill" style="color: #ef4444; font-size: 0.45rem; vertical-align: middle;"></i>
+                                        {% endif %}
+                                        {{ target.server.name }}
+                                    </div>
+                                {% empty %}
+                                    <small style="color: var(--bs-secondary-color); opacity: 0.6;">{% trans "No target servers" %}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% empty %}
+                        <span style="color: var(--bs-secondary-color); font-style: italic; opacity: 0.6; font-size: 0.85rem;">{% trans "No connected scripts" %}</span>
+                    {% endfor %}
+                </td>
+                <td style="text-align: right; padding-right: 16px; vertical-align: top; padding-top: 15px;">
+                    <div style="display: flex; gap: 4px; justify-content: flex-end; align-items: center; flex-wrap: nowrap;">
+                        {% if cert.is_acme %}
+                            <a href="{% url 'core_cert:certificate_test_issue' cert.pk %}" class="btn" style="background-color: #64748b; color: white; padding: 5px 8px; font-size: 0.78rem; white-space: nowrap;" title="{% trans "Issue test certificate (using staging server)" %}">{% trans "Test" %}</a>
+                            <a href="{% url 'core_cert:certificate_issue' cert.pk %}" class="btn" style="background-color: #f59e0b; color: white; padding: 5px 8px; font-size: 0.78rem; white-space: nowrap;" title="{% trans "Issue new certificate or change settings" %}">{% trans "Issue" %}</a>
+                            {% if cert.expiry_date %}
+                                <a href="{% url 'core_cert:certificate_renew' cert.pk %}" class="btn" style="background-color: #10b981; color: white; padding: 5px 8px; font-size: 0.78rem; white-space: nowrap;" title="{% trans "Renew with existing settings" %}">{% trans "Renew" %}</a>
+                            {% endif %}
+                        {% else %}
+                            <span class="badge" style="background-color: #6366f1; color: white; padding: 5px 8px; font-size: 0.72rem; white-space: nowrap;" title="{% trans "Manual certificate: issuance/renewal is disabled. Renew it by editing and uploading a new ZIP file." %}">{% trans "Manual (renew via Edit)" %}</span>
+                        {% endif %}
+                        <a href="{% url 'core_cert:certificate_edit' cert.pk %}" class="btn" style="background-color: #94a3b8; color: white; padding: 5px 7px; font-size: 0.78rem;" title="{% trans "Edit" %}"><i class="bi bi-pencil"></i></a>
+                        <a href="{% url 'core_cert:certificate_delete' cert.pk %}" class="btn" style="background-color: #ef4444; color: white; padding: 5px 7px; font-size: 0.78rem;" title="{% trans "Delete" %}"><i class="bi bi-trash"></i></a>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" style="text-align: center; padding: 40px; color: var(--bs-secondary-color);">{% trans "No domains registered. Try [Full Sync]." %}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    (function() {
+        function initDnsChallenge() {
+            window.showDnsChallenge = function(pk, domain) {
+                fetch(`/api/cname/${pk}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            showAlert('{% trans "No Challenge Info" %}', data.error);
+                            return;
+                        }
+                        
+                        const html = `
+                            <div style="text-align: left;">
+                                <p style="font-size: 0.9rem; color: var(--bs-secondary-color); margin-bottom: 15px;">
+                                    {% trans "Please add the following CNAME record to your DNS settings for certificate issuance." %}
+                                </p>
+                                
+                                <div style="margin-bottom: 15px;">
+                                    <label style="font-size: 0.75rem; color: var(--bs-secondary-color); font-weight: 600;">{% trans "Domain (Host)" %}</label>
+                                    <div style="display: flex; gap: 8px;">
+                                        <input type="text" value="${data.domain}" readonly class="form-control form-control-sm" id="cname-host">
+                                        <button class="btn btn-sm btn-outline-primary" onclick="copyToClipboard('cname-host')">{% trans "Copy" %}</button>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label style="font-size: 0.75rem; color: var(--bs-secondary-color); font-weight: 600;">{% trans "Value (Target)" %}</label>
+                                    <div style="display: flex; gap: 8px;">
+                                        <input type="text" value="${data.cname_target}" readonly class="form-control form-control-sm" id="cname-value">
+                                        <button class="btn btn-sm btn-outline-primary" onclick="copyToClipboard('cname-value')">{% trans "Copy" %}</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        
+                        showAlert(`{% trans "DNS Challenge Info" %}: ${domain}`, html);
+                    })
+                    .catch(err => {
+                        showAlert('{% trans "Error" %}', '{% trans "Failed to fetch information." %}');
+                    });
+            };
+
+            window.copyToClipboard = function(elementId) {
+                const input = document.getElementById(elementId);
+                if (!input) return;
+                input.select();
+                document.execCommand('copy');
+                
+                const btn = input.nextElementSibling;
+                if (!btn) return;
+                const originalText = btn.innerText;
+                btn.innerText = '{% trans "Done!" %}';
+                btn.classList.replace('btn-outline-primary', 'btn-success');
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.classList.replace('btn-success', 'btn-outline-primary');
+                }, 2000);
+            };
+        }
+
+        document.addEventListener('htmx:afterSettle', initDnsChallenge);
+        initDnsChallenge();
+    })();
+</script>
+{% endblock %}

@@ -1,0 +1,712 @@
+{% extends "base.html" %}
+{% load static %}
+{% load dict_tags %}
+{% load i18n %}
+
+{% block title %}{% if object %}수정{% else %}등록{% endif %} - AgnCERT{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+    <h2 style="margin: 0;">{% if object %}배포 설정 수정: {{ object.name }}{% else %}새 배포 설정 등록{% endif %}</h2>
+    <a href="{% url 'core_cert:script_list' %}" class="btn" style="background-color: #64748b;">목록으로</a>
+</div>
+
+<div class="card" style="border-top: 4px solid var(--accent);">
+    <form method="post" id="script-form" style="display: grid; gap: 24px;">
+        {% csrf_token %}
+        
+        <!-- Basic Info -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="field-wrapper">
+                <label class="field-label">연결된 도메인</label>
+                {{ form.certificate }}
+            </div>
+            <div class="field-wrapper">
+                <label class="field-label">설정 이름 (식별용)</label>
+                {{ form.name }}
+            </div>
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 10px 0;">
+
+        <!-- Deployment Targets -->
+        <div class="field-wrapper">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <label class="field-label" style="font-size: 1.1rem; display: flex; align-items: center; gap: 8px;">
+                    배포 대상 서버 및 파일 매핑
+                    <span style="font-weight: normal; font-size: 0.85rem; color: #64748b;">(서버별로 전송할 파일과 경로를 설정하세요)</span>
+                </label>
+                <button type="button" id="add-target-btn" class="btn" style="background-color: #10b981; padding: 6px 16px; font-size: 0.85rem;">+ 서버 추가</button>
+            </div>
+
+            {{ formset.management_form }}
+            <div id="formset-container" style="display: grid; gap: 20px;">
+                {% for target_form, mapping_formset in formset_mappings %}
+                    <div class="target-card" data-index="{{ forloop.index0 }}" id="target-card-{{ forloop.index0 }}" style="background: var(--bs-card-bg); border: 1px solid var(--bs-border-color); border-radius: 8px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.1); {% if target_form.DELETE.value %}display: none;{% endif %}">
+                        {% for hidden in target_form.hidden_fields %}{{ hidden }}{% endfor %}
+                        
+                        <!-- Target Server Header -->
+                        <div class="target-header" style="background: var(--bs-tertiary-bg); padding: 15px; border-bottom: 1px solid var(--bs-border-color); display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 15px; align-items: end;">
+                            <div class="input-group group-server">
+                                <label class="sub-label" style="display: block; font-size: 0.75rem; color: var(--bs-secondary-color); margin-bottom: 4px;">대상 서버</label>
+                                {{ target_form.server }}
+                            </div>
+                            <div class="input-group group-path">
+                                <label class="sub-label" style="display: block; font-size: 0.75rem; color: var(--bs-secondary-color); margin-bottom: 4px;">원격 저장 경로</label>
+                                {{ target_form.remote_path }}
+                            </div>
+                            <div class="input-group group-command">
+                                <label class="sub-label" style="display: block; font-size: 0.75rem; color: var(--bs-secondary-color); margin-bottom: 4px;">스크립트 실행(EXEC)</label>
+                                {{ target_form.reload_command }}
+                            </div>
+                            <div class="group-actions" style="display: flex; gap: 10px; align-items: center; padding-bottom: 8px;">
+                                <div style="display: none;">{{ target_form.DELETE }}</div>
+                                <button type="button" class="remove-target-btn" style="background: none; border: none; color: #ef4444; cursor: pointer; font-size: 1.2rem;" title="서버 삭제">×</button>
+                            </div>
+                        </div>
+
+                        <!-- Target Options & File Mappings -->
+                        <div style="padding: 20px; display: grid; grid-template-columns: 200px 1fr; gap: 30px;">
+                            <!-- Options -->
+                            <div style="border-right: 1px solid var(--bs-border-color); padding-right: 20px;">
+                                <label class="sub-label" style="margin-bottom: 10px; font-weight: 600; display: block; color: var(--bs-heading-color);">배포 단계 설정</label>
+                                <div style="display: grid; gap: 10px;">
+                                    <label class="check-item" style="font-size: 0.85rem; display: flex; align-items: center; gap: 8px; color: var(--bs-body-color);">{{ target_form.prepare_dir }} 디렉토리 생성</label>
+                                    <label class="check-item" style="font-size: 0.85rem; display: flex; align-items: center; gap: 8px; color: var(--bs-body-color);">{{ target_form.transfer_files }} 파일 전송</label>
+                                    <label class="check-item" style="font-size: 0.85rem; display: flex; align-items: center; gap: 8px; color: var(--bs-body-color);">{{ target_form.reload_service }} 스크립트 실행(EXEC)</label>
+                                    <label class="check-item windows-only-option" style="font-size: 0.85rem; display: flex; align-items: center; gap: 8px; color: var(--bs-body-color);">{{ target_form.include_all_bindings }} 전체 바인드 포함(윈도우용)</label>
+                                </div>
+                            </div>
+
+                            <!-- Mappings -->
+                            <div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                    <label class="sub-label" style="margin: 0; font-weight: 600; color: var(--bs-heading-color);">전송할 파일 목록</label>
+                                    <div style="display: flex; gap: 8px;">
+                                        <button type="button" class="load-defaults-btn btn btn-sm" style="background: var(--bs-tertiary-bg); border: 1px solid var(--bs-border-color); color: var(--bs-body-color); font-size: 0.75rem;">기본값 로드</button>
+                                        <button type="button" class="add-mapping-btn btn btn-sm" style="background: var(--bs-tertiary-bg); border: 1px solid var(--bs-border-color); color: var(--bs-body-color); font-size: 0.75rem;">+ 파일 추가</button>
+                                    </div>
+                                </div>
+                                {{ mapping_formset.management_form }}
+                                <div class="mapping-container" style="display: grid; gap: 8px; min-width: 0;">
+                                    {% for m_form in mapping_formset %}
+                                        <div class="mapping-row" data-index="{{ forloop.index0 }}" {% if m_form.DELETE.value %}style="display: none;"{% endif %}>
+                                            {% for hidden in m_form.hidden_fields %}{{ hidden }}{% endfor %}
+                                            <div class="mapping-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 10px;">
+                                                <div>{{ m_form.file_type }}</div>
+                                                <div>{{ m_form.custom_filename }}</div>
+                                                <div>{{ m_form.custom_path }}</div>
+                                                <div style="display: flex; align-items: center;">
+                                                    <div style="display: none;">{{ m_form.DELETE }}</div>
+                                                    <button type="button" class="remove-mapping-btn" style="background: none; border: none; color: #ef4444; cursor: pointer; font-size: 1rem;">×</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                <small style="display: block; margin-top: 10px; color: var(--bs-secondary-color); font-size: 0.75rem;">* 파일명을 비워두면 실제 파일 이름(fullchain.cer 등)으로 전송됩니다. 특정 경로를 비워두면 대상 서버의 공통 경로로 전송됩니다. (특정 경로 입력 시 해당 디렉토리 자동 생성, Linux·Windows 공통)</small>
+
+                                {# --- 도커 컨테이너 재시작 (Linux & Windows) --- #}
+                                {# restart_containers_json hidden 필드는 위의 hidden_fields 루프에서 이미 출력됨 (중복 출력 금지) #}
+                                <div class="docker-restart-section" style="margin-top: 16px; border-top: 1px solid var(--bs-border-color); padding-top: 12px;">
+                                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                                        <label class="field-label" style="margin: 0;">{% trans "Restart Docker Containers" %}</label>
+                                        <button type="button" class="docker-refresh-btn btn btn-sm" style="background: var(--bs-tertiary-bg); border: 1px solid var(--bs-border-color); color: var(--bs-body-color); font-size: 0.75rem;">{% trans "Refresh" %}</button>
+                                    </div>
+                                    <div class="docker-list" style="margin-top: 8px; display: grid; gap: 4px; font-size: 0.82rem;">
+                                        <span class="docker-hint" style="color: var(--bs-secondary-color);">{% trans "Click Refresh to load running containers (docker ps over SSH)." %}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Templates for JS -->
+        <template id="target-template">
+            <div class="target-card" data-index="__prefix__" style="background: var(--bs-card-bg); border: 1px solid var(--bs-border-color); border-radius: 8px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">
+                <div class="target-header" style="background: var(--bs-tertiary-bg); padding: 15px; border-bottom: 1px solid var(--bs-border-color); display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 15px; align-items: end;">
+                    <div class="input-group group-server">
+                        <label class="sub-label" style="display: block; font-size: 0.75rem; color: var(--bs-secondary-color); margin-bottom: 4px;">대상 서버</label>
+                        <select name="deployment_targets-__prefix__-server" class="form-input server-select" id="id_deployment_targets-__prefix__-server">
+                            <option value="">---------</option>
+                            {% for s in servers %}
+                                <option value="{{ s.id }}">{{ s.name }} ({{ s.ip_address }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="input-group group-path">
+                        <label class="sub-label" style="display: block; font-size: 0.75rem; color: var(--bs-secondary-color); margin-bottom: 4px;">원격 저장 경로</label>
+                        <input type="text" name="deployment_targets-__prefix__-remote_path" placeholder="/etc/nginx/ssl" class="form-input" id="id_deployment_targets-__prefix__-remote_path">
+                    </div>
+                    <div class="input-group group-command">
+                        <label class="sub-label" style="display: block; font-size: 0.75rem; color: var(--bs-secondary-color); margin-bottom: 4px;">스크립트 실행(EXEC)</label>
+                        <input type="text" name="deployment_targets-__prefix__-reload_command" placeholder="예: systemctl reload nginx 또는 커스텀 스크립트" class="form-input" id="id_deployment_targets-__prefix__-reload_command">
+                    </div>
+                    <div class="group-actions" style="padding-bottom: 8px;">
+                        <button type="button" class="remove-target-btn" style="background: none; border: none; color: #ef4444; cursor: pointer; font-size: 1.2rem;" title="서버 삭제">×</button>
+                    </div>
+                </div>
+                <div style="padding: 20px; display: grid; grid-template-columns: 200px 1fr; gap: 30px;">
+                    <div style="border-right: 1px solid var(--bs-border-color); padding-right: 20px;">
+                        <label class="sub-label" style="margin-bottom: 10px; font-weight: 600; display: block; color: var(--bs-heading-color);">배포 단계 설정</label>
+                        <div style="display: grid; gap: 10px;">
+                            <label class="check-item" style="font-size: 0.85rem; display: flex; align-items: center; gap: 8px; color: var(--bs-body-color);"><input type="checkbox" name="deployment_targets-__prefix__-prepare_dir" class="form-checkbox" id="id_deployment_targets-__prefix__-prepare_dir" checked> 디렉토리 생성</label>
+                            <label class="check-item" style="font-size: 0.85rem; display: flex; align-items: center; gap: 8px; color: var(--bs-body-color);"><input type="checkbox" name="deployment_targets-__prefix__-transfer_files" class="form-checkbox" id="id_deployment_targets-__prefix__-transfer_files" checked> 파일 전송</label>
+                            <label class="check-item" style="font-size: 0.85rem; display: flex; align-items: center; gap: 8px; color: var(--bs-body-color);"><input type="checkbox" name="deployment_targets-__prefix__-reload_service" class="form-checkbox" id="id_deployment_targets-__prefix__-reload_service" checked> 스크립트 실행(EXEC)</label>
+                            <label class="check-item windows-only-option" style="font-size: 0.85rem; display: flex; align-items: center; gap: 8px; color: var(--bs-body-color);"><input type="checkbox" name="deployment_targets-__prefix__-include_all_bindings" class="form-checkbox" id="id_deployment_targets-__prefix__-include_all_bindings"> 전체 바인드 포함(윈도우용)</label>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <label class="sub-label" style="margin: 0; font-weight: 600; color: var(--bs-heading-color);">전송할 파일 목록</label>
+                            <div style="display: flex; gap: 8px;">
+                                <button type="button" class="load-defaults-btn btn btn-sm" style="background: var(--bs-tertiary-bg); border: 1px solid var(--bs-border-color); color: var(--bs-body-color); font-size: 0.75rem;">기본값 로드</button>
+                                <button type="button" class="add-mapping-btn btn btn-sm" style="background: var(--bs-tertiary-bg); border: 1px solid var(--bs-border-color); color: var(--bs-body-color); font-size: 0.75rem;">+ 파일 추가</button>
+                            </div>
+                        </div>
+                        <input type="hidden" name="deployment_targets-__prefix__-file_mappings-TOTAL_FORMS" value="0" id="id_deployment_targets-__prefix__-file_mappings-TOTAL_FORMS">
+                        <input type="hidden" name="deployment_targets-__prefix__-file_mappings-INITIAL_FORMS" value="0" id="id_deployment_targets-__prefix__-file_mappings-INITIAL_FORMS">
+                        <input type="hidden" name="deployment_targets-__prefix__-file_mappings-MIN_NUM_FORMS" value="0" id="id_deployment_targets-__prefix__-file_mappings-MIN_NUM_FORMS">
+                        <input type="hidden" name="deployment_targets-__prefix__-file_mappings-MAX_NUM_FORMS" value="1000" id="id_deployment_targets-__prefix__-file_mappings-MAX_NUM_FORMS">
+                        <div class="mapping-container" style="display: grid; gap: 8px;"></div>
+
+                        {# --- 도커 컨테이너 재시작 (Linux & Windows) --- #}
+                        <div class="docker-restart-section" style="margin-top: 16px; border-top: 1px solid var(--bs-border-color); padding-top: 12px;">
+                            <input type="hidden" name="deployment_targets-__prefix__-restart_containers_json" class="restart-containers-input" id="id_deployment_targets-__prefix__-restart_containers_json">
+                            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                                <label class="field-label" style="margin: 0;">{% trans "Restart Docker Containers" %}</label>
+                                <button type="button" class="docker-refresh-btn btn btn-sm" style="background: var(--bs-tertiary-bg); border: 1px solid var(--bs-border-color); color: var(--bs-body-color); font-size: 0.75rem;">{% trans "Refresh" %}</button>
+                            </div>
+                            <div class="docker-list" style="margin-top: 8px; display: grid; gap: 4px; font-size: 0.82rem;">
+                                <span class="docker-hint" style="color: var(--bs-secondary-color);">{% trans "Click Refresh to load running containers (docker ps over SSH)." %}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <template id="mapping-template">
+            <div class="mapping-row" data-index="__m_prefix__">
+                <div class="mapping-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 10px;">
+                    <select name="deployment_targets-__prefix__-file_mappings-__m_prefix__-file_type" class="form-input" id="id_deployment_targets-__prefix__-file_mappings-__m_prefix__-file_type">
+                        <option value="fullchain">Fullchain (fullchain.cer/pem)</option>
+                        <option value="key">Private Key (.key/pem)</option>
+                        <option value="cert">Certificate (.cer/pem)</option>
+                        <option value="chain">Intermediate chain (domain_chain.cer)</option>
+                        <option value="chain_aaa">Intermediate chain — AAA cross-sign, legacy (ZeroSSL)</option>
+                        <option value="chain_usertrust">Intermediate chain — USERTrust cross-sign, legacy (ZeroSSL)</option>
+                        <option value="pfx">PFX (cert.pfx)</option>
+                        <option value="rootca">Root CA chain (domain_RootCA.pem)</option>
+                    </select>
+                    <input type="text" name="deployment_targets-__prefix__-file_mappings-__m_prefix__-custom_filename" placeholder="파일명 변경 (선택)" class="form-input" id="id_deployment_targets-__prefix__-file_mappings-__m_prefix__-custom_filename">
+                    <input type="text" name="deployment_targets-__prefix__-file_mappings-__m_prefix__-custom_path" placeholder="특정 경로 (선택)" class="form-input" id="id_deployment_targets-__prefix__-file_mappings-__m_prefix__-custom_path">
+                    <button type="button" class="remove-mapping-btn" style="background: none; border: none; color: #ef4444; cursor: pointer; font-size: 1rem;">×</button>
+                </div>
+            </div>
+        </template>
+
+        <div style="margin-top: 10px; display: flex; gap: 12px; justify-content: flex-end; padding: 20px; background: var(--bs-tertiary-bg); border-radius: 0 0 8px 8px; border-top: 1px solid var(--bs-border-color);">
+            <button type="submit" class="btn" style="padding: 12px 30px; font-weight: 600; font-size: 1rem;">설정 저장하기</button>
+        </div>
+    </form>
+</div>
+
+<!-- Preview Section -->
+<div class="field-wrapper" style="margin-top: 30px;">
+    <label class="field-label" style="color: #64748b;">💻 실행 구조 미리보기 (Simulation)</label>
+    <pre id="script-preview" style="background: #1a1d20; color: #e9ecef; padding: 15px; border-radius: 8px; font-size: 0.85rem; min-height: 100px; border: 1px solid #343a40;"></pre>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    (function() {
+        var serverData = {
+            {% for s in servers %}
+            "{{ s.id }}": {
+                "name": "{{ s.name }}",
+                "ip_address": "{{ s.ip_address }}",
+                "ssh_user": "{{ s.ssh_user }}",
+                "ssh_port": "{{ s.ssh_port }}",
+                "os_type": "{{ s.os_type }}",
+                "web_server_type": "{{ s.web_server_type }}",
+                "path_type": "{{ s.path_type }}",
+                "custom_path": "{{ s.custom_path }}"
+            },
+            {% endfor %}
+        };
+
+        var certificateWildcardMap = {
+            {% for c in form.fields.certificate.queryset %}
+            "{{ c.id }}": {{ c.is_wildcard|yesno:"true,false" }},
+            {% endfor %}
+        };
+
+        // 인증서 ID → 실제 도메인 매핑 (드롭다운 표시 텍스트는 인증서 이름일 수 있으므로,
+        // 미리보기의 파일명/경로 생성에는 반드시 실제 도메인을 사용한다.)
+        var certificateDomainMap = {
+            {% for c in form.fields.certificate.queryset %}
+            "{{ c.id }}": "{{ c.domain }}",
+            {% endfor %}
+        };
+
+        // 인증서 ID → file_type별 '실제 원본 파일명' 매핑.
+        // 서버(build_cert_source_file_map)가 deploy_domain 과 동일한 탐색(get_source_file) 결과를 내려준다.
+        // 수동 인증서가 acme.sh 기본 이름과 다른 파일명을 쓰더라도 미리보기가 실제 SCP 동작과 일치하도록 한다.
+        var certSourceFileMap = {{ cert_source_files|default:"{}"|safe }};
+
+        // 현재 선택된 인증서의 실제 도메인을 반환한다. (없으면 드롭다운 텍스트로 폴백)
+        function getSelectedDomain() {
+            const domainSelect = document.getElementById('id_certificate');
+            if (!domainSelect) return "example.com";
+            const realDomain = certificateDomainMap[domainSelect.value];
+            return realDomain || domainSelect.selectedOptions[0]?.text || "example.com";
+        }
+
+        function initScriptForm() {
+            const form = document.getElementById('script-form');
+            if (!form || form.dataset.initialized) return;
+            
+            form.dataset.initialized = "true";
+
+            const preview = document.getElementById('script-preview');
+            const container = document.getElementById('formset-container');
+            const addTargetBtn = document.getElementById('add-target-btn');
+            const targetTemplate = document.getElementById('target-template');
+            const mappingTemplate = document.getElementById('mapping-template');
+            const totalTargets = document.getElementById('id_deployment_targets-TOTAL_FORMS');
+
+            function getDefaults(serverId, domain) {
+                const data = serverData[serverId];
+                if (!data) return { path: '', reload: '' };
+                
+                let path = '';
+                let reload = '';
+                const safeDomain = (domain || 'example.com').replace('*.', '');
+                
+                if (data.os_type === 'linux') {
+                    if (data.web_server_type === 'nginx') {
+                        path = data.path_type === 'custom' ? data.custom_path : '/etc/nginx/ssl';
+                        reload = 'sudo nginx -t && sudo systemctl reload nginx';
+                        } else if (data.web_server_type === 'apache') {
+                        path = data.path_type === 'custom' ? data.custom_path : '/etc/httpd/ssl';
+                        reload = 'sudo httpd -t && sudo systemctl reload httpd';
+                        }                } else if (data.os_type === 'windows') {
+                    path = 'C:/certs';
+                    const pfxPath = path + '/' + safeDomain + '.pfx';
+                    const domainSelect = document.getElementById('id_certificate');
+                    const certId = domainSelect.value;
+                    const isWildcard = certificateWildcardMap[certId] || false;
+                    const psIsWildcard = isWildcard ? '$true' : '$false';
+                    const namingBase = safeDomain + (isWildcard ? '[*]' : '[o]');
+                    reload = 'powershell -ExecutionPolicy Bypass -Command "$pfxPath = \'' + pfxPath + '\'; $pfxPass = \'password\'; $domain = \'' + safeDomain + '\'; $isWildcard = ' + psIsWildcard + '; $securePass = ConvertTo-SecureString $pfxPass -AsPlainText -Force; $certs = Import-PfxCertificate -FilePath $pfxPath -CertStoreLocation Cert:\\LocalMachine\\WebHosting -Password $securePass -Exportable; $thumbprint = ($certs | Where-Object { $_.HasPrivateKey } | Select-Object -First 1).Thumbprint; $dt = Get-Date -Format \'yyyyMMddHH\'; $fn = \'' + namingBase + '_\' + $dt; Get-Item Cert:\\LocalMachine\\WebHosting\\$thumbprint | ForEach-Object { $_.FriendlyName = $fn }; Import-Module WebAdministration; Get-Website | ForEach-Object { $sn = $_.Name; $_.Bindings.Collection | Where-Object { $bi = $_.BindingInformation; if ($_.Protocol -eq \'https\') { $hostHeader = $bi.Split(\':\')[-1]; $match = $false; if ($isWildcard) { $match = ($hostHeader -eq $domain) -or ($hostHeader -like \\\"*.$domain\\\"); } else { $match = ($hostHeader -eq $domain); } if ($match) { $_.AddSslCertificate($thumbprint, \'WebHosting\'); Set-WebBinding -Name $sn -BindingInformation $bi -PropertyName \'SslFlags\' -Value 1; } } } }"';
+                }
+                return { path, reload };
+            }
+
+            // "전체 바인드 포함" 명령: 호스트 이름이 빈칸인 443 포트 https 바인딩에
+            // 임포트된 인증서를 적용한다. (Windows 전용, EXEC와 별개로 실행)
+            function getAllBindingsCommand(serverId, domain) {
+                const data = serverData[serverId];
+                if (!data || data.os_type !== 'windows') return '';
+                const safeDomain = (domain || 'example.com').replace('*.', '');
+                const pfxPath = 'C:/certs/' + safeDomain + '.pfx';
+                return 'powershell -ExecutionPolicy Bypass -Command "$pfxPath = \'' + pfxPath + '\'; $pfxPass = \'password\'; $securePass = ConvertTo-SecureString $pfxPass -AsPlainText -Force; $certs = Import-PfxCertificate -FilePath $pfxPath -CertStoreLocation Cert:\\LocalMachine\\WebHosting -Password $securePass -Exportable; $thumbprint = ($certs | Where-Object { $_.HasPrivateKey } | Select-Object -First 1).Thumbprint; Import-Module WebAdministration; Get-Website | ForEach-Object { $sn = $_.Name; $_.Bindings.Collection | Where-Object { $bi = $_.BindingInformation; if ($_.Protocol -eq \'https\') { $parts = $bi.Split(\':\'); $port = $parts[1]; $hostHeader = $parts[2]; if ($port -eq \'443\' -and $hostHeader -eq \'\') { $_.AddSslCertificate($thumbprint, \'WebHosting\'); } } } }"';
+            }
+
+            // 만료 인증서 정리 명령: 우리 규칙(WebHosting + FriendlyName '<도메인>[o/*]_<타임스탬프>')으로
+            // 추가됐고, 현재 어떤 https 바인딩에도 쓰이지 않는 만료 인증서만 삭제한다. (Windows 전용)
+            // deploy_domain.py 의 build_cleanup_expired_command() 와 동일한 로직을 유지한다.
+            function getCleanupExpiredCommand(serverId) {
+                const data = serverData[serverId];
+                if (!data || data.os_type !== 'windows') return '';
+                return 'powershell -ExecutionPolicy Bypass -Command "Import-Module WebAdministration; $used = @(); Get-Website | ForEach-Object { $_.Bindings.Collection | Where-Object { $_.Protocol -eq \'https\' } | ForEach-Object { if ($_.CertificateHash) { $ch = $_.CertificateHash; if ($ch -is [byte[]]) { $used += ([System.BitConverter]::ToString($ch)).Replace(\'-\',\'\').ToUpper() } else { $used += ([string]$ch).Replace(\'-\',\'\').ToUpper() } } } }; Get-ChildItem Cert:\\LocalMachine\\WebHosting | Where-Object { ($_.FriendlyName -match \'\\[(o|\\*)\\]_\\d{10}$\') -and ($_.NotAfter -lt (Get-Date)) -and ($used -notcontains $_.Thumbprint.ToUpper()) } | ForEach-Object { Remove-Item $_.PSPath -Force; Write-Output (\'Removed expired: \' + $_.FriendlyName) }"';
+            }
+
+            function updatePreview() {
+                if (!preview) return;
+                const domain = getSelectedDomain();
+                let script = "#!/bin/bash\n";
+                script += "# [AgnCERT] Deployment Logic Simulation for: " + domain + "\n\n";
+
+                const targetCards = document.querySelectorAll('.target-card');
+                
+                targetCards.forEach((card, index) => {
+                    const isDeleted = card.querySelector('input[name$="-DELETE"]')?.checked;
+                    const targetIndex = card.dataset.index;
+
+                    if (isDeleted) return;
+
+                    const serverId = card.querySelector('.server-select')?.value;
+                    const data = serverData[serverId] || { name: 'Unknown', ip_address: 'IP', ssh_user: 'USER', ssh_port: 'PORT' };
+                    
+                    const path = card.querySelector('input[name$="-remote_path"]')?.value || "/path/to/deploy";
+                    const reload = card.querySelector('input[name$="-reload_command"]')?.value;
+
+                    const doPrepare = card.querySelector('input[name$="-prepare_dir"]')?.checked;
+                    const doTransfer = card.querySelector('input[name$="-transfer_files"]')?.checked;
+                    const doReload = card.querySelector('input[name$="-reload_service"]')?.checked;
+
+                    script += "## [Target " + (index + 1) + "] " + data.name + " (" + data.ip_address + ")\n";
+                    if (doPrepare) script += "ssh -p " + data.ssh_port + " " + data.ssh_user + "@" + data.ip_address + " \"mkdir -p " + path + "\"\n";
+
+                    if (doTransfer) {
+                        const mappings = card.querySelectorAll('.mapping-row');
+                        
+                        mappings.forEach((row, mIdx) => {
+                            const mDeleted = row.querySelector('input[name$="-DELETE"]')?.checked;
+                            if (mDeleted) return;
+
+                            const type = row.querySelector('select[name$="-file_type"]')?.value;
+                            const custom = row.querySelector('input[name$="-custom_filename"]')?.value;
+                            const customPath = row.querySelector('input[name$="-custom_path"]')?.value?.trim();
+                            if (type) {
+                                const baseDomain = domain.replace('*.', '');
+                                // 선택된 인증서의 실제 원본 파일명을 우선 사용 (수동 인증서 대응).
+                                // 맵에 없으면 acme.sh 기본 명명 규칙으로 폴백한다.
+                                const certId = document.getElementById('id_certificate')?.value;
+                                const srcMap = certSourceFileMap[certId];
+                                let src = (srcMap && srcMap[type]) || (baseDomain + '_fullchain.cer');
+                                if (!(srcMap && srcMap[type])) {
+                                    if (type === 'key') src = baseDomain + '.key';
+                                    else if (type === 'cert') src = baseDomain + '.cer';
+                                    else if (type === 'pfx') src = baseDomain + '.pfx';
+                                    else if (type === 'rootca') src = baseDomain + '_RootCA.pem';
+                                    else if (type === 'chain') src = baseDomain + '_chain.cer';
+                                    else if (type === 'chain_aaa') src = baseDomain + '_chain_AAA.cer';
+                                    else if (type === 'chain_usertrust') src = baseDomain + '_chain_USERTRUST.cer';
+                                }
+
+                                let dst = custom || src;
+                                const destDir = customPath || path;
+                                if (customPath) {
+                                    script += "ssh -p " + data.ssh_port + " " + data.ssh_user + "@" + data.ip_address + " \"mkdir -p " + customPath + "\"\n";
+                                }
+                                script += "scp -P " + data.ssh_port + " " + src + " " + data.ssh_user + "@" + data.ip_address + ":" + destDir + "/" + dst + "\n";
+                            }
+                        });
+                    }
+
+                    if (doReload && reload) {
+                        const escapedReload = reload.replace(/"/g, '\\"');
+                        script += "ssh -p " + data.ssh_port + " " + data.ssh_user + "@" + data.ip_address + " \"" + escapedReload + "\"\n";
+                    }
+
+                    // 전체 바인드 포함 (Windows IIS): EXEC와 별개로, 빈 호스트 443 바인딩에 인증서 적용
+                    const doAllBindings = card.querySelector('input[name$="-include_all_bindings"]')?.checked;
+                    if (doAllBindings && data.os_type === 'windows' && data.web_server_type === 'iis') {
+                        const bindCmd = getAllBindingsCommand(serverId, domain);
+                        if (bindCmd) {
+                            const escapedBind = bindCmd.replace(/"/g, '\\"');
+                            script += "ssh -p " + data.ssh_port + " " + data.ssh_user + "@" + data.ip_address + " \"" + escapedBind + "\"\n";
+                        }
+                    }
+
+                    // 만료 인증서 정리 (Windows IIS): 웹서버가 IIS이고 '스크립트 실행'이 켜져 있을 때만 (IIS 미구축 서버 대비)
+                    if (data.os_type === 'windows' && data.web_server_type === 'iis' && doReload) {
+                        const cleanupCmd = getCleanupExpiredCommand(serverId);
+                        if (cleanupCmd) {
+                            const escapedCleanup = cleanupCmd.replace(/"/g, '\\"');
+                            script += "ssh -p " + data.ssh_port + " " + data.ssh_user + "@" + data.ip_address + " \"" + escapedCleanup + "\"\n";
+                        }
+                    }
+
+                    // 도커 컨테이너 재시작 (Linux & Windows): EXEC와 별개 독립 단계
+                    const restartNames = getSelectedContainers(card);
+                    if (restartNames.length) {
+                        script += "ssh -p " + data.ssh_port + " " + data.ssh_user + "@" + data.ip_address + " \"docker restart " + restartNames.join(' ') + "\"\n";
+                    }
+                    script += "\n";
+                });
+                preview.textContent = script;
+            }
+
+            function addMapping(card, fileType, customFilename) {
+                let targetIndex = card.dataset.index;
+                // If data-index is missing, try to derive it from the ID or count
+                if (targetIndex === undefined || targetIndex === "") {
+                    const allCards = Array.from(document.querySelectorAll('.target-card'));
+                    targetIndex = allCards.indexOf(card).toString();
+                    card.dataset.index = targetIndex;
+                }
+
+                const mappingContainer = card.querySelector('.mapping-container');
+                const totalMappings = card.querySelector('input[name$="-TOTAL_FORMS"]');
+                const mCount = parseInt(totalMappings.value);
+
+                let html = mappingTemplate.innerHTML.replace(/__prefix__/g, targetIndex).replace(/__m_prefix__/g, mCount);
+                const div = document.createElement('div');
+                div.innerHTML = html;
+                const row = div.firstElementChild;
+                
+                if (fileType) row.querySelector('select').value = fileType;
+                if (customFilename) row.querySelector('input[type="text"]').value = customFilename;
+
+                mappingContainer.appendChild(row);
+                totalMappings.value = mCount + 1;
+                updatePreview();
+            }
+
+            function loadDefaultsForCard(card) {
+                const serverSelect = card.querySelector('.server-select');
+                const serverId = serverSelect.value;
+                if (!serverId) return;
+
+                const mappingContainer = card.querySelector('.mapping-container');
+                const data = serverData[serverId];
+                const domain = getSelectedDomain();
+                const defaults = getDefaults(serverId, domain);
+                
+                // 1. 기본 경로 및 명령어 설정
+                card.querySelector('input[name$="-remote_path"]').value = defaults.path;
+                card.querySelector('input[name$="-reload_command"]').value = defaults.reload;
+
+                // 2. 필요한 기본 매핑 정의
+                let requiredMappings = [];
+                if (data && data.os_type === 'windows') {
+                    requiredMappings = [{type: 'pfx', file: ''}];
+                } else if (data && data.web_server_type === 'apache') {
+                    // Apache: SSLCertificateFile/KeyFile/ChainFile 구조에 맞춰 cert + key + chain(중간 CA)
+                    requiredMappings = [
+                        {type: 'cert', file: ''},
+                        {type: 'key', file: ''},
+                        {type: 'chain', file: ''}
+                    ];
+                } else {
+                    // Nginx 등: fullchain + key 관례 유지
+                    requiredMappings = [
+                        {type: 'cert', file: ''},
+                        {type: 'key', file: ''},
+                        {type: 'fullchain', file: ''}
+                    ];
+                }
+
+                // 3. 기존 행(row) 재활용 및 업데이트
+                const existingRows = Array.from(mappingContainer.querySelectorAll('.mapping-row')).filter(row => {
+                    // 삭제 대기 중인 것은 제외 (완전 삭제된 것은 DOM에 없음)
+                    return row.style.display !== 'none';
+                });
+
+                requiredMappings.forEach((mapping, idx) => {
+                    if (existingRows[idx]) {
+                        // 기존 행 업데이트
+                        const row = existingRows[idx];
+                        const select = row.querySelector('select[name$="-file_type"]');
+                        const input = row.querySelector('input[name$="-custom_filename"]');
+                        const delCheck = row.querySelector('input[name$="-DELETE"]');
+                        
+                        if (select) select.value = mapping.type;
+                        if (input) input.value = mapping.file;
+                        if (delCheck) delCheck.checked = false; // 혹시 모르니 체크 해제
+                    } else {
+                        // 행이 모자라면 새로 추가
+                        addMapping(card, mapping.type, mapping.file);
+                    }
+                });
+
+                // 4. 남는 기존 행들은 삭제 처리
+                if (existingRows.length > requiredMappings.length) {
+                    for (let i = requiredMappings.length; i < existingRows.length; i++) {
+                        const row = existingRows[i];
+                        const delCheck = row.querySelector('input[name$="-DELETE"]');
+                        if (delCheck) {
+                            delCheck.checked = true;
+                            row.style.display = 'none';
+                        } else {
+                            row.remove();
+                            // TOTAL_FORMS 감소 필요
+                            const totalMappings = card.querySelector('input[name$="-TOTAL_FORMS"]');
+                            totalMappings.value = parseInt(totalMappings.value) - 1;
+                        }
+                    }
+                }
+                updatePreview();
+            }
+
+            // === 도커 컨테이너 재시작 ===
+            function getSelectedContainers(card) {
+                const input = card.querySelector('.restart-containers-input');
+                if (!input || !input.value) return [];
+                try { const v = JSON.parse(input.value); return Array.isArray(v) ? v : []; }
+                catch (e) { return []; }
+            }
+            function setSelectedContainers(card, names) {
+                const input = card.querySelector('.restart-containers-input');
+                if (input) input.value = JSON.stringify(names);
+            }
+            function syncDockerSelection(card) {
+                const names = [];
+                card.querySelectorAll('.docker-list input[type="checkbox"]:checked').forEach(cb => names.push(cb.value));
+                setSelectedContainers(card, names);
+                updatePreview();
+            }
+            function renderDockerList(card, containers, opts) {
+                opts = opts || {};
+                const listEl = card.querySelector('.docker-list');
+                if (!listEl) return;
+                const selected = getSelectedContainers(card);
+                listEl.innerHTML = '';
+                if (opts.message) {
+                    const span = document.createElement('span');
+                    span.style.color = opts.error ? '#ef4444' : 'var(--bs-secondary-color)';
+                    span.textContent = opts.message;
+                    listEl.appendChild(span);
+                }
+                // 현재 떠있지 않지만 이전에 선택된 컨테이너도 유지해서 보여준다
+                const running = containers.map(c => c.name);
+                const extras = selected.filter(n => running.indexOf(n) === -1).map(n => ({name: n, image: '', status: '(not running now)'}));
+                [...containers, ...extras].forEach(c => {
+                    const label = document.createElement('label');
+                    label.className = 'check-item';
+                    label.style.cssText = 'display:flex; align-items:center; gap:8px; cursor:pointer; color:var(--bs-body-color);';
+                    const cb = document.createElement('input');
+                    cb.type = 'checkbox'; cb.className = 'form-checkbox'; cb.value = c.name;
+                    cb.checked = selected.indexOf(c.name) !== -1;
+                    cb.addEventListener('change', () => syncDockerSelection(card));
+                    const text = document.createElement('span');
+                    text.innerHTML = '<strong>' + c.name + '</strong>' +
+                        (c.image ? ' <span style="color:var(--bs-secondary-color);">(' + c.image + ')</span>' : '') +
+                        (c.status ? ' <span style="color:var(--bs-secondary-color); font-size:0.75rem;">' + c.status + '</span>' : '');
+                    label.appendChild(cb); label.appendChild(text);
+                    listEl.appendChild(label);
+                });
+            }
+            function refreshDockerList(card) {
+                const serverId = card.querySelector('.server-select')?.value;
+                const listEl = card.querySelector('.docker-list');
+                if (!serverId) { renderDockerList(card, [], {message: '{% trans "Select a server first." %}', error: true}); return; }
+                if (listEl) listEl.innerHTML = '<span style="color:var(--bs-secondary-color);">{% trans "Loading containers..." %}</span>';
+                fetch('/servers/' + serverId + '/docker-ps/')
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.ok) {
+                            renderDockerList(card, data.containers || [],
+                                (data.containers && data.containers.length) ? {} : {message: '{% trans "No running containers found." %}'});
+                        } else {
+                            renderDockerList(card, [], {message: ('{% trans "Failed to load:" %} ') + (data.error || ''), error: true});
+                        }
+                    })
+                    .catch(err => renderDockerList(card, [], {message: ('{% trans "Failed to load:" %} ') + err, error: true}));
+            }
+            // 페이지 로드 시 기존 선택값이 있으면 목록(미실행 표시 포함)을 그려둔다
+            function initDockerSections() {
+                document.querySelectorAll('.target-card').forEach(card => {
+                    if (getSelectedContainers(card).length) renderDockerList(card, []);
+                });
+            }
+
+            addTargetBtn.onclick = function() {
+                const count = parseInt(totalTargets.value);
+                let html = targetTemplate.innerHTML.replace(/__prefix__/g, count);
+                const div = document.createElement('div');
+                div.innerHTML = html;
+                const newCard = div.firstElementChild;
+                container.appendChild(newCard);
+                totalTargets.value = count + 1;
+                toggleWindowsOptions(newCard);
+                updatePreview();
+            };
+
+            form.onsubmit = function(e) {
+                const formData = new FormData(form);
+            };
+
+            container.onclick = function(e) {
+                const target = e.target;
+                if (target.classList.contains('remove-target-btn')) {
+                    const card = target.closest('.target-card');
+                    const deleteCheck = card.querySelector('input[name$="-DELETE"]');
+                    if (deleteCheck) { deleteCheck.checked = true; card.style.display = 'none'; }
+                    else { card.remove(); }
+                    updatePreview();
+                } else if (target.classList.contains('add-mapping-btn')) {
+                    addMapping(target.closest('.target-card'));
+                } else if (target.classList.contains('load-defaults-btn')) {
+                    loadDefaultsForCard(target.closest('.target-card'));
+                } else if (target.classList.contains('docker-refresh-btn')) {
+                    refreshDockerList(target.closest('.target-card'));
+                } else if (target.classList.contains('remove-mapping-btn')) {
+                    const row = target.closest('.mapping-row');
+                    const deleteCheck = row.querySelector('input[name$="-DELETE"]');
+                    if (deleteCheck) { deleteCheck.checked = true; row.style.display = 'none'; }
+                    else { row.remove(); }
+                    updatePreview();
+                }
+            };
+
+            // 카드의 "전체 바인드 포함(윈도우용)" 옵션을 선택된 서버 OS에 따라 표시/숨김 처리한다.
+            function toggleWindowsOptions(card) {
+                const serverId = card.querySelector('.server-select')?.value;
+                const data = serverData[serverId];
+                const isWindows = data && data.os_type === 'windows';
+                card.querySelectorAll('.windows-only-option').forEach((el) => {
+                    el.style.display = isWindows ? 'flex' : 'none';
+                    if (!isWindows) {
+                        const cb = el.querySelector('input[name$="-include_all_bindings"]');
+                        if (cb) cb.checked = false;
+                    }
+                });
+            }
+
+            container.onchange = function(e) {
+                if (e.target.classList.contains('server-select')) {
+                    const card = e.target.closest('.target-card');
+                    const serverId = e.target.value;
+                    const domain = getSelectedDomain();
+                    const defaults = getDefaults(serverId, domain);
+                    card.querySelector('input[name$="-remote_path"]').value = defaults.path;
+                    card.querySelector('input[name$="-reload_command"]').value = defaults.reload;
+                    loadDefaultsForCard(card);
+                    toggleWindowsOptions(card);
+                    // 서버가 바뀌면 도커 선택을 초기화하고 안내 문구로 되돌린다
+                    setSelectedContainers(card, []);
+                    const dl = card.querySelector('.docker-list');
+                    if (dl) dl.innerHTML = '<span class="docker-hint" style="color:var(--bs-secondary-color);">{% trans "Click Refresh to load running containers (docker ps over SSH)." %}</span>';
+                    updatePreview();
+                }
+            };
+
+            // 인증서(도메인) 변경 시: 각 타겟의 reload 명령이 "이전 도메인으로 자동 생성된 기본값"과
+            // 일치하면 새 도메인 기준으로 재생성한다. 사용자가 직접 수정한 값은 보존한다.
+            const certSelect = document.getElementById('id_certificate');
+            let prevDomain = getSelectedDomain();
+            if (certSelect) {
+                certSelect.addEventListener('change', function() {
+                    const newDomain = getSelectedDomain();
+                    if (newDomain !== prevDomain) {
+                        document.querySelectorAll('.target-card').forEach((card) => {
+                            const serverId = card.querySelector('.server-select')?.value;
+                            if (!serverId) return;
+                            const reloadInput = card.querySelector('input[name$="-reload_command"]');
+                            if (!reloadInput) return;
+                            // 이전 도메인 기준 자동값과 현재 입력값이 같을 때만 재생성 (수동 편집 보존)
+                            const prevAuto = getDefaults(serverId, prevDomain).reload;
+                            if (reloadInput.value === prevAuto) {
+                                reloadInput.value = getDefaults(serverId, newDomain).reload;
+                            }
+                        });
+                        prevDomain = newDomain;
+                    }
+                    updatePreview();
+                });
+            }
+
+            // 페이지 로드 시 기존 카드들의 Windows 전용 옵션 표시 상태를 초기화한다.
+            document.querySelectorAll('.target-card').forEach(toggleWindowsOptions);
+            // 기존 도커 컨테이너 선택값 복원
+            initDockerSections();
+
+            form.oninput = updatePreview;
+            form.onchange = updatePreview;
+            updatePreview();
+        }
+
+        document.addEventListener('htmx:afterSettle', initScriptForm);
+        initScriptForm();
+    })();
+</script>
+{% endblock %}

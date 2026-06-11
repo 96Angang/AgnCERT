@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Login" %} - AgnMonitor{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-4">
+        <div class="card shadow border-0 mt-5" style="background: var(--card-bg); border: 1px solid var(--card-border) !important; color: var(--text-main);">
+            <div class="card-body p-5">
+                <h3 class="text-center mb-4">{% trans "Login" %}</h3>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="username" class="form-label">{% trans "Username" %}</label>
+                        <input type="text" name="username" class="form-control" id="username" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="password" class="form-label">{% trans "Password" %}</label>
+                        <input type="password" name="password" class="form-control" id="password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 py-2">{% trans "Login" %}</button>
+                </form>
+                {% if form.errors %}
+                    <div class="alert alert-danger mt-3 pb-0">
+                        <p>{% trans "Invalid username or password." %}</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

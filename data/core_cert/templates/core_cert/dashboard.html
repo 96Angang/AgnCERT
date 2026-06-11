@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Dashboard" %} - AgnCert{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+    <h2 style="margin: 0;">{% trans "System Dashboard" %}</h2>
+    <div style="display: flex; gap: 8px;">
+        <a href="{% url 'core_cert:certificate_list' %}" class="btn" style="background-color: #64748b; color: white;">{% trans "Certificate Management" %}</a>
+        <a href="{% url 'core_cert:settings' %}" class="btn btn-primary">{% trans "System Settings" %}</a>
+    </div>
+</div>
+
+<!-- 요약 통계 카드 -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 24px;">
+    <div class="card" style="margin-bottom: 0; border-left: 4px solid #10b981;">
+        <h3 style="margin-top: 0; font-size: 0.875rem; color: var(--bs-heading-color); opacity: 0.8;">{% trans "Total Certificates" %}</h3>
+        <p style="font-size: 1.875rem; font-weight: 700; margin: 8px 0;">{{ certs_count }}</p>
+        <div style="font-size: 0.85rem;">
+            <span style="color: #ef4444; font-weight: 600;">{% trans "Expired" %}: {{ expired_count }}</span> | 
+            <span style="color: #f59e0b; font-weight: 600;">{% trans "Expiring Soon" %}: {{ expiring_soon }}</span>
+        </div>
+    </div>
+    <div class="card" style="margin-bottom: 0; border-left: 4px solid #3b82f6;">
+        <h3 style="margin-top: 0; font-size: 0.875rem; color: var(--bs-heading-color); opacity: 0.8;">{% trans "Target Servers" %}</h3>
+        <p style="font-size: 1.875rem; font-weight: 700; margin: 8px 0;">{{ servers_count }}</p>
+        <div style="font-size: 0.85rem;">
+            <span style="color: #10b981;">{% trans "Healthy" %}</span> | 
+            <span style="color: #ef4444; font-weight: 600;">{% trans "Failed" %}: {{ server_fail_count }}</span>
+        </div>
+    </div>
+    <div class="card" style="margin-bottom: 0; border-left: 4px solid #8b5cf6;">
+        <h3 style="margin-top: 0; font-size: 0.875rem; color: var(--bs-heading-color); opacity: 0.8;">{% trans "Unresolved Failures" %}</h3>
+        <p style="font-size: 1.875rem; font-weight: 700; margin: 8px 0;">{% if deploy_fail_count > 0 %}<span style="color: #ef4444;">{{ deploy_fail_count }}{% trans " items" %}</span>{% else %}<span style="color: #10b981;">0{% trans " items" %}</span>{% endif %}</p>
+        <div style="font-size: 0.85rem; color: var(--bs-secondary-color);">{% trans "Deployment tasks needing attention (Total)" %}</div>
+    </div>
+</div>
+
+{% if unresolved_fail_logs %}
+<!-- 미해결 배포 실패 로그 섹션 -->
+<div class="card" style="border: 1px solid rgba(239, 68, 68, 0.4); background-color: rgba(239, 68, 68, 0.05); margin-bottom: 24px;">
+    <h3 style="margin-top: 0; color: #f87171; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <i class="bi bi-exclamation-octagon-fill"></i> {% trans "Unresolved Deployment Failures" %}
+        </div>
+        <div id="bulk-actions" style="display: none; gap: 8px;">
+            <button type="button" class="btn btn-sm" style="background: #10b981; color: white; font-size: 0.75rem; white-space: nowrap;" onclick="submitBulkAction('resolve')">{% trans "Resolve Selected" %}</button>
+            <button type="button" class="btn btn-sm" style="background: #ef4444; color: white; font-size: 0.75rem; white-space: nowrap;" onclick="submitBulkAction('delete')">{% trans "Delete Selected" %}</button>
+        </div>
+    </h3>
+    <div style="max-height: 300px; overflow-y: auto;">
+        <form id="bulk-log-form" action="{% url 'core_cert:bulk_log_action' %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action_type" id="bulk-action-type" value="">
+            <table style="background: transparent;">
+                <thead>
+                    <tr style="border-bottom: 1px solid var(--bs-border-color);">
+                        <th style="width: 40px; text-align: center;">
+                            <input type="checkbox" id="select-all-logs" style="cursor: pointer;">
+                        </th>
+                        <th style="color: var(--bs-heading-color);">{% trans "Script (Domain)" %}</th>
+                        <th style="color: var(--bs-heading-color);">{% trans "Status" %}</th>
+                        <th style="color: var(--bs-heading-color);">{% trans "Error Summary" %}</th>
+                        <th style="color: var(--bs-heading-color);">{% trans "Time" %}</th>
+                        <th style="text-align: right; color: var(--bs-heading-color);">{% trans "Actions" %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in unresolved_fail_logs %}
+                    <tr style="border-bottom: 1px solid var(--bs-border-color);">
+                        <td style="text-align: center;">
+                            <input type="checkbox" name="log_ids" value="{{ log.pk }}" class="log-checkbox" style="cursor: pointer;">
+                        </td>
+                        <td>
+                            <a href="{% url 'core_cert:script_detail' log.script.pk %}" style="font-weight: 600; color: var(--bs-heading-color);">{{ log.script.name }}</a>
+                            <div style="font-size: 0.75rem; color: var(--bs-secondary-color);">{{ log.script.certificate.domain }}</div>
+                        </td>
+                        <td>
+                            <span class="badge {% if log.status == 'partial_success' %}badge-warning{% else %}badge-error{% endif %}">
+                                {{ log.status }}
+                            </span>
+                        </td>
+                        <td style="font-size: 0.85rem; color: #f87171;">{{ log.log_output }}</td>
+                        <td style="font-size: 0.85rem; color: var(--bs-secondary-color);">{{ log.started_at|date:"m-d H:i" }}</td>
+                        <td style="text-align: right;">
+                            <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                                <a href="{% url 'core_cert:resolve_log' log.pk %}" class="btn btn-sm" style="background: #10b981; color: white; font-size: 0.75rem; white-space: nowrap;">{% trans "Resolved" %}</a>
+                                <a href="{% url 'core_cert:delete_log' log.pk %}" class="btn btn-sm" style="background: #ef4444; color: white; font-size: 0.75rem; white-space: nowrap;" onclick="return confirm('{% trans "Delete this log?" %}')">{% trans "Delete" %}</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </form>
+    </div>
+</div>
+
+<script>
+    (function() {
+        function initBulkActions() {
+            const selectAll = document.getElementById('select-all-logs');
+            const checkboxes = document.querySelectorAll('.log-checkbox');
+            const bulkActionDiv = document.getElementById('bulk-actions');
+            const form = document.getElementById('bulk-log-form');
+
+            if (!selectAll || !bulkActionDiv) return;
+
+            function updateBulkActionVisibility() {
+                const checkedCount = document.querySelectorAll('.log-checkbox:checked').length;
+                bulkActionDiv.style.display = checkedCount > 0 ? 'flex' : 'none';
+            }
+
+            selectAll.onchange = function() {
+                checkboxes.forEach(cb => cb.checked = selectAll.checked);
+                updateBulkActionVisibility();
+            };
+
+            checkboxes.forEach(cb => {
+                cb.onchange = updateBulkActionVisibility;
+            });
+
+            window.submitBulkAction = function(type) {
+                const checkedCount = document.querySelectorAll('.log-checkbox:checked').length;
+                if (checkedCount === 0) return;
+                
+                const confirmMsg = type === 'delete' ? `{% trans "Delete selected " %}${checkedCount}{% trans " logs?" %}` : `{% trans "Mark selected " %}${checkedCount}{% trans " logs as resolved?" %}`;
+                if (!confirm(confirmMsg)) return;
+
+                document.getElementById('bulk-action-type').value = type;
+                form.submit();
+            };
+        }
+
+        document.addEventListener('htmx:afterSettle', initBulkActions);
+        initBulkActions();
+    })();
+</script>
+{% endif %}
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+    <!-- 배포 스크립트 목록 -->
+    <div class="card">
+        <h3 style="margin-top: 0; display: flex; align-items: center; gap: 8px; color: var(--bs-heading-color);">
+            <i class="bi bi-file-earmark-code"></i> {% trans "Deployment Scripts" %}
+        </h3>
+        <div style="max-height: 400px; overflow-y: auto;">
+            <table style="width: 100%;">
+                <thead>
+                    <tr style="border-bottom: 1px solid var(--bs-border-color);">
+                        <th style="color: var(--bs-heading-color);">{% trans "Script Name" %}</th>
+                        <th style="color: var(--bs-heading-color);">{% trans "Target Domain" %}</th>
+                        <th style="color: var(--bs-heading-color);">{% trans "Actions" %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for script in scripts %}
+                    <tr style="border-bottom: 1px solid var(--bs-border-color);">
+                        <td><strong style="color: var(--bs-heading-color);">{{ script.name }}</strong></td>
+                        <td><code style="font-size: 0.85rem; background: rgba(0,0,0,0.2); padding: 2px 5px; border-radius: 4px; color: var(--bs-info-text-emphasis);">{{ script.certificate.domain }}</code></td>
+                        <td><a href="{% url 'core_cert:script_detail' script.pk %}" class="btn btn-sm btn-outline-primary" style="font-size: 0.75rem;">{% trans "Run" %}</a></td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" style="text-align: center; color: var(--bs-secondary-color); padding: 20px;">{% trans "No scripts registered." %}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 최근 로그 목록 -->
+    <div class="card">
+        <h3 style="margin-top: 0; display: flex; align-items: center; gap: 8px; color: var(--bs-heading-color);">
+            <i class="bi bi-journal-text"></i> {% trans "Recent Deployment Logs" %}
+        </h3>
+        <div style="max-height: 400px; overflow-y: auto;">
+            <table style="width: 100%;">
+                <thead>
+                    <tr style="border-bottom: 1px solid var(--bs-border-color);">
+                        <th style="color: var(--bs-heading-color);">{% trans "Script" %}</th>
+                        <th style="color: var(--bs-heading-color);">{% trans "Status" %}</th>
+                        <th style="color: var(--bs-heading-color);">{% trans "Time" %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in recent_logs %}
+                    <tr style="border-bottom: 1px solid var(--bs-border-color);">
+                        <td style="color: var(--bs-body-color);">{{ log.script.name }}</td>
+                        <td>
+                            <span class="badge {% if log.status == 'success' %}badge-success{% elif log.status == 'partial_success' %}badge-warning{% else %}badge-error{% endif %}">
+                                {{ log.status }}
+                            </span>
+                        </td>
+                        <td style="font-size: 0.85rem; color: var(--bs-secondary-color);">{{ log.started_at|date:"m-d H:i" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" style="text-align: center; color: var(--bs-secondary-color); padding: 20px;">{% trans "No recent logs." %}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="card" style="margin-top: 24px; background-color: rgba(0,0,0,0.05); border: 1px dashed var(--bs-border-color); text-align: center; padding: 20px;">
+    <p style="margin: 0; color: var(--bs-secondary-color); font-size: 0.9rem;">
+        {% trans "Need to change system settings?" %} <a href="{% url 'core_cert:settings' %}" style="font-weight: 600; color: #3b82f6;">{% trans "Go to Settings Management" %}</a> {% trans "to update auto-renewal time and API information." %}
+    </p>
+</div>
+{% endblock %}

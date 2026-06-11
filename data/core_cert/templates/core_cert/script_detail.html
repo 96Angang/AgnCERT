@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{{ script.name }} {% trans "Deployment" %} - AgnCert{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h3 style="margin-top: 0; color: var(--bs-heading-color);">{% trans "Script Info" %}: {{ script.name }}</h3>
+    <p style="color: var(--bs-body-color);">{% trans "Connected Domain" %}: {{ script.certificate.domain }}</p>
+    <button id="start-deploy" class="btn btn-primary">{% trans "Start Deployment" %}</button>
+</div>
+
+<div class="card">
+    <h3 style="margin-top: 0; color: var(--bs-heading-color);">{% trans "Real-time Deployment Logs" %}</h3>
+    <div id="log-container" style="background: #0f172a; color: #38bdf8; padding: 20px; border-radius: 4px; font-family: monospace; height: 300px; overflow-y: auto;">
+        <div>{% trans "Click the button above to start deployment..." %}</div>
+    </div>
+</div>
+
+<div class="card">
+    <h3 style="margin-top: 0; display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+        <div style="display: flex; align-items: center; gap: 8px; color: var(--bs-heading-color);">
+            <i class="bi bi-journal-text"></i> {% trans "Execution History" %}
+        </div>
+        <div id="bulk-actions" style="display: none; gap: 8px;">
+            <button type="button" class="btn btn-sm" style="background: #10b981; color: white; font-size: 0.75rem; white-space: nowrap;" onclick="submitBulkAction('resolve')">{% trans "Resolve Selected" %}</button>
+            <button type="button" class="btn btn-sm" style="background: #ef4444; color: white; font-size: 0.75rem; white-space: nowrap;" onclick="submitBulkAction('delete')">{% trans "Delete Selected" %}</button>
+        </div>
+    </h3>
+
+    <form id="bulk-log-form" action="{% url 'core_cert:bulk_log_action' %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="action_type" id="bulk-action-type" value="">
+        <input type="hidden" name="next" value="{{ request.path }}">
+        
+        <div style="padding: 10px 16px; background: var(--bs-tertiary-bg); border-bottom: 1px solid var(--bs-border-color); display: flex; align-items: center; gap: 10px;">
+            <input type="checkbox" id="select-all-logs" style="cursor: pointer;">
+            <label for="select-all-logs" style="font-size: 0.85rem; color: var(--bs-secondary-color); cursor: pointer; margin: 0;">{% trans "Select All" %}</label>
+        </div>
+
+        <div style="display: grid; gap: 16px; padding: 16px;">
+            {% for log in logs %}
+            <div style="border: 1px solid var(--bs-border-color); border-radius: 8px; overflow: hidden; background: var(--bs-card-bg);">
+                <div style="background: var(--bs-tertiary-bg); padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--bs-border-color);">
+                    <div style="display: flex; gap: 12px; align-items: center;">
+                        <input type="checkbox" name="log_ids" value="{{ log.pk }}" class="log-checkbox" style="cursor: pointer;">
+                        <span class="badge {% if log.status == 'success' %}badge-success{% elif log.status == 'partial_success' %}badge-warning{% else %}badge-error{% endif %}">
+                            {{ log.get_status_display|default:log.status }}
+                        </span>
+                        <span style="font-weight: 600; font-size: 0.9rem; color: var(--bs-heading-color);">{{ log.started_at|date:"Y-m-d H:i:s" }}</span>
+                    </div>
+                    <div style="color: var(--bs-secondary-color); font-size: 0.85rem; text-align: right;">
+                        <div style="font-weight: 600; color: var(--bs-heading-color); margin-bottom: 2px;">{{ log.log_output|linebreaksbr }}</div>
+                        {% if log.details.verification %}
+                            {% if log.details.verification.status == 'verified' %}
+                                {% if log.details.verification.match %}
+                                    <span style="color: #10b981; font-weight: 600;"><i class="fas fa-check-double"></i> {% trans "Site applied successfully" %}</span>
+                                {% else %}
+                                    <span style="color: #f59e0b; font-weight: 600;"><i class="fas fa-exclamation-triangle"></i> {% trans "Certificate mismatch on site" %}</span>
+                                {% endif %}
+                            {% elif log.details.verification.status == 'skipped' %}
+                                <span style="color: var(--bs-secondary-color); font-weight: 600;"><i class="fas fa-minus-circle"></i> {% trans "Verification skipped (no matching site found)" %}</span>
+                            {% else %}
+                                <span style="color: #ef4444; font-weight: 600;"><i class="fas fa-times-circle"></i> {% trans "Failed to connect to site" %}</span>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+                <div style="padding: 12px 16px;">
+                    <div style="display: grid; gap: 8px;">
+                        {% for target in log.details.targets %}
+                        <details style="background: rgba(0,0,0,0.1); border-radius: 4px; border: 1px solid var(--bs-border-color); border-left: 4px solid {% if target.status == 'success' %}#10b981{% else %}#ef4444{% endif %};" {% if target.status != 'success' %}open{% endif %}>
+                            <summary style="padding: 8px 12px; cursor: pointer; font-size: 0.85rem; display: flex; justify-content: space-between; list-style: none;">
+                                <span style="display: flex; gap: 8px; align-items: center; color: var(--bs-body-color);">
+                                    <i class="fas {% if target.status == 'success' %}fa-check-circle text-success{% else %}fa-times-circle text-error{% endif %}"></i>
+                                    <strong>{{ target.server_name }}</strong> ({{ target.ip_address }})
+                                </span>
+                                <span style="color: var(--bs-secondary-color); font-weight: 600;">{% if target.status == 'success' %}{% trans "Success" %}{% else %}{% trans "Failure" %}{% endif %} <i class="fas fa-chevron-down" style="font-size: 0.7rem;"></i></span>
+                            </summary>
+                            <div style="padding: 12px; border-top: 1px solid var(--bs-border-color); background: rgba(0,0,0,0.2); font-family: monospace; font-size: 0.8rem; white-space: pre-line; color: var(--bs-body-color);">{% for line in target.logs %}{{ line }}
+{% endfor %}</div>
+                        </details>
+                        {% endfor %}
+                    </div>
+                    <div style="text-align: right; margin-top: 10px; display: flex; gap: 8px; justify-content: flex-end;">
+                        {% if log.status != 'success' and not log.is_resolved %}
+                            <a href="{% url 'core_cert:resolve_log' log.pk %}?next={{ request.path }}" class="btn btn-sm" style="background: #10b981; color: white; font-size: 0.75rem; white-space: nowrap;">{% trans "Mark as Resolved" %}</a>
+                        {% endif %}
+                        <a href="{% url 'core_cert:delete_log' log.pk %}?next={{ request.path }}" class="btn btn-sm" style="background: #ef4444; color: white; font-size: 0.75rem; white-space: nowrap;" onclick="return confirm('{% trans "Delete this log?" %}')">{% trans "Delete Log" %}</a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div style="text-align: center; padding: 40px; color: var(--bs-secondary-color); border: 2px dashed var(--bs-border-color); border-radius: 8px;">
+                {% trans "No execution history." %}
+            </div>
+            {% endfor %}
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    (function() {
+        function initDeployAction() {
+            const startBtn = document.getElementById('start-deploy');
+            if (!startBtn || startBtn.dataset.initialized) return;
+            
+            startBtn.dataset.initialized = "true";
+
+            const scriptId = "{{ script.id }}";
+            const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+            const socketUrl = `${protocol}://${window.location.host}/ws/cert/deploy/${scriptId}/`;
+            const logContainer = document.getElementById('log-container');
+            
+            let socket = null;
+
+            function connect() {
+                if (socket && (socket.readyState === WebSocket.OPEN || socket.readyState === WebSocket.CONNECTING)) return;
+                socket = new WebSocket(socketUrl);
+
+                socket.onopen = function() {
+                    logContainer.innerHTML += '<div style="color: var(--bs-secondary-color);">[{% trans "System" %}] {% trans "Connected to deployment server." %}</div>';
+                };
+
+                socket.onmessage = function(e) {
+                    const data = JSON.parse(e.data);
+                    if (data.type === 'log') {
+                        const div = document.createElement('div');
+                        div.textContent = `[${new Date().toLocaleTimeString()}] ${data.message}`;
+                        logContainer.appendChild(div);
+                        logContainer.scrollTop = logContainer.scrollHeight;
+                    }
+                };
+            }
+
+            startBtn.onclick = function() {
+                if (!socket || socket.readyState !== WebSocket.OPEN) {
+                    connect();
+                    setTimeout(() => startBtn.click(), 500);
+                    return;
+                }
+                logContainer.innerHTML = '<div>[{% trans "System" %}] {% trans "Sending deployment request..." %}</div>';
+                socket.send(JSON.stringify({ 'action': 'start_deploy' }));
+            };
+
+            connect();
+        }
+
+        function initBulkActions() {
+            const selectAll = document.getElementById('select-all-logs');
+            const checkboxes = document.querySelectorAll('.log-checkbox');
+            const bulkActionDiv = document.getElementById('bulk-actions');
+            const form = document.getElementById('bulk-log-form');
+
+            if (!selectAll || !bulkActionDiv) return;
+
+            function updateBulkActionVisibility() {
+                const checkedCount = document.querySelectorAll('.log-checkbox:checked').length;
+                bulkActionDiv.style.display = checkedCount > 0 ? 'flex' : 'none';
+            }
+
+            selectAll.onchange = function() {
+                checkboxes.forEach(cb => cb.checked = selectAll.checked);
+                updateBulkActionVisibility();
+            };
+
+            checkboxes.forEach(cb => {
+                cb.onchange = updateBulkActionVisibility;
+            });
+
+            window.submitBulkAction = function(type) {
+                const checkedCount = document.querySelectorAll('.log-checkbox:checked').length;
+                if (checkedCount === 0) return;
+                
+                const confirmMsg = type === 'delete' ? `{% trans "Delete selected " %}${checkedCount}{% trans " logs?" %}` : `{% trans "Mark selected " %}${checkedCount}{% trans " logs as resolved?" %}`;
+                if (!confirm(confirmMsg)) return;
+
+                document.getElementById('bulk-action-type').value = type;
+                form.submit();
+            };
+        }
+
+        function cleanupLogText() {
+            const logDivs = document.querySelectorAll('.card [style*="white-space: pre-line"]');
+            logDivs.forEach(div => {
+                if (div.textContent.includes('\\n')) {
+                    div.textContent = div.textContent.replace(/\\n/g, '\n');
+                }
+            });
+        }
+
+        document.addEventListener('htmx:afterSettle', initDeployAction);
+        document.addEventListener('htmx:afterSettle', initBulkActions);
+        document.addEventListener('htmx:afterSettle', cleanupLogText);
+        initDeployAction();
+        initBulkActions();
+        cleanupLogText();
+    })();
+</script>
+{% endblock %}

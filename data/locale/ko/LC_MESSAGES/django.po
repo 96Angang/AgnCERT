@@ -1,0 +1,1789 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-06-10 15:48+0900\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: config/settings.py:138
+msgid "English"
+msgstr "영어"
+
+#: config/settings.py:139
+msgid "Korean"
+msgstr "한국어"
+
+#: core_cert/consumers.py:141
+#: core_cert/templates/core_cert/certificate_action.html:69
+msgid ""
+"Issuance and renewal are disabled for manual certificates. To renew, go to "
+"Edit and upload a new ZIP file for manual renewal."
+msgstr ""
+"수동 인증서는 발급 및 갱신이 제한됩니다. 갱신하려면 [수정]에서 ZIP 파일을 선"
+"택해 수동 갱신해 주세요."
+
+#: core_cert/forms.py:16
+msgid "acme-dns (Fixed)"
+msgstr "acme-dns (고정)"
+
+#: core_cert/forms.py:20
+msgid "EC 256 (ECDSA, Recommended)"
+msgstr "EC 256 (ECDSA, 권장)"
+
+#: core_cert/forms.py:26 core_cert/models.py:16
+msgid "Automatic (acme.sh / CA Server)"
+msgstr "자동 (acme.sh / CA 서버)"
+
+#: core_cert/forms.py:27
+msgid "Manual (Upload ZIP)"
+msgstr "수동 (ZIP 업로드)"
+
+#: core_cert/forms.py:35 core_cert/templates/core_cert/certificate_form.html:69
+msgid "Certificate ZIP file"
+msgstr "인증서 ZIP 파일"
+
+#: core_cert/forms.py:36
+msgid "Upload a ZIP containing the certificate, key and fullchain files."
+msgstr "인증서, 키, fullchain 파일이 포함된 ZIP을 업로드하세요."
+
+#: core_cert/forms.py:43
+msgid "e.g., example.com (Let's Encrypt)"
+msgstr "예: example.com (Let's Encrypt)"
+
+#: core_cert/forms.py:47
+msgid "e.g., example.com or *.example.com"
+msgstr "예: example.com 또는 *.example.com"
+
+#: core_cert/forms.py:51
+msgid "Automatically suggested on domain input..."
+msgstr "도메인 입력 시 자동 제안됨..."
+
+#: core_cert/forms.py:75 core_cert/templates/core_cert/certificate_form.html:35
+msgid "Title"
+msgstr "제목"
+
+#: core_cert/forms.py:76 core_cert/templates/core_cert/certificate_form.html:23
+msgid "Issuance Method"
+msgstr "발급 방식"
+
+#: core_cert/forms.py:77 core_cert/templates/core_cert/certificate_form.html:53
+msgid "CA Server"
+msgstr "CA 서버"
+
+#: core_cert/forms.py:78 core_cert/templates/core_cert/certificate_form.html:57
+msgid "Key Type"
+msgstr "키 유형"
+
+#: core_cert/forms.py:80
+msgid "Certificate path in acme.sh. (Suggested automatically)"
+msgstr "acme.sh 내 인증서 경로 (자동으로 제안됨)"
+
+#: core_cert/forms.py:83 core_cert/forms.py:84
+msgid "Calculated on issuance."
+msgstr "발급 시 자동 계산됩니다."
+
+#: core_cert/forms.py:96
+msgid "A ZIP file is required for manual certificates."
+msgstr "수동 인증서에는 ZIP 파일이 필요합니다."
+
+#: core_cert/forms.py:98
+msgid "Only ZIP files are allowed."
+msgstr "ZIP 파일만 업로드할 수 있습니다."
+
+#: core_cert/forms.py:162
+msgid "Server Name (e.g., Production Nginx)"
+msgstr "서버 이름 (예: 운영 Nginx)"
+
+#: core_cert/forms.py:169
+msgid "e.g., /etc/nginx/ssl"
+msgstr "예: /etc/nginx/ssl"
+
+#: core_cert/forms.py:170
+msgid "e.g., /etc/httpd/conf.d/ssl.conf"
+msgstr "예: /etc/httpd/conf.d/ssl.conf"
+
+#: core_cert/forms.py:190
+msgid "This web server type is not valid for the selected OS."
+msgstr "선택한 OS에서는 사용할 수 없는 웹서버 유형입니다."
+
+#: core_cert/forms.py:216
+msgid "e.g., systemctl reload nginx or custom script"
+msgstr "예: systemctl reload nginx 또는 커스텀 스크립트"
+
+#: core_cert/forms.py:251
+msgid "Rename file (Optional)"
+msgstr "파일명 변경 (선택 사항)"
+
+#: core_cert/forms.py:252
+msgid "Specific path (Optional)"
+msgstr "특정 경로 (선택)"
+
+#: core_cert/models.py:5
+msgid "Name"
+msgstr "이름"
+
+#: core_cert/models.py:8
+msgid "Unique certificate serial number"
+msgstr "고유 인증서 일련번호"
+
+#: core_cert/models.py:12
+msgid "Whether it is a wildcard certificate (*.domain.com)"
+msgstr "와일드카드 인증서 여부 (*.domain.com)"
+
+#: core_cert/models.py:13
+msgid "All domains included in the certificate (SANs)"
+msgstr "인증서에 포함된 모든 도메인 (SANs)"
+
+#: core_cert/models.py:17
+msgid "Manual (Upload files)"
+msgstr "수동 (파일 업로드)"
+
+#: core_cert/models.py:19
+msgid "Issuance method: automatic via acme.sh or manual upload"
+msgstr "발급 방식: acme.sh를 통한 자동 발급 또는 수동 업로드"
+
+#: core_cert/models.py:22
+msgid "Whether the certificate is managed by acme.sh"
+msgstr "acme.sh 관리 여부"
+
+#: core_cert/models.py:23
+msgid "CA Server (e.g., letsencrypt, zerossl)"
+msgstr "CA 서버 (예: letsencrypt, zerossl)"
+
+#: core_cert/models.py:24
+msgid "e.g., dns_cf, dns_aws"
+msgstr "예: dns_cf, dns_aws"
+
+#: core_cert/models.py:29
+msgid "Key type and length"
+msgstr "키 유형 및 길이"
+
+#: core_cert/models.py:104 core_cert/templates/core_cert/server_list.html:61
+msgid "Pending"
+msgstr "대기 중"
+
+#: core_cert/models.py:105 core_cert/templates/core_cert/server_list.html:57
+msgid "Connected"
+msgstr "연결됨"
+
+#: core_cert/models.py:106 core_cert/templates/core_cert/dashboard.html:30
+#: core_cert/templates/core_cert/server_list.html:59
+msgid "Failed"
+msgstr "실패"
+
+#: core_cert/models.py:110
+msgid "None"
+msgstr "없음"
+
+#: core_cert/models.py:118
+msgid "Default Path"
+msgstr "기본 경로"
+
+#: core_cert/models.py:119 core_cert/templates/core_cert/server_form.html:61
+msgid "Custom Path"
+msgstr "사용자 정의 경로"
+
+#: core_cert/models.py:122
+msgid "Input if custom path is selected (e.g., /etc/nginx/ssl)"
+msgstr "사용자 정의 경로 선택 시 입력 (예: /etc/nginx/ssl)"
+
+#: core_cert/models.py:123
+msgid "SSL config file path (e.g., /etc/httpd/conf.d/ssl.conf)"
+msgstr "SSL 설정 파일 경로 (예: /etc/httpd/conf.d/ssl.conf)"
+
+#: core_cert/models.py:133
+msgid "Service port (usually 443)"
+msgstr "서비스 포트 (보통 443)"
+
+#: core_cert/models.py:153
+msgid "Remote server path where the certificate will be stored"
+msgstr "인증서가 저장될 원격 서버 경로"
+
+#: core_cert/models.py:154
+msgid "e.g., systemctl reload nginx"
+msgstr "예: systemctl reload nginx"
+
+#: core_cert/models.py:156
+msgid "Create target directory"
+msgstr "대상 디렉토리 생성"
+
+#: core_cert/models.py:157
+msgid "Transfer certificate files"
+msgstr "인증서 파일 전송"
+
+#: core_cert/models.py:158
+msgid "Run post-processing script (EXEC)"
+msgstr "후처리 스크립트 실행 (EXEC)"
+
+#: core_cert/models.py:159
+msgid ""
+"Also update the certificate on the 443 binding with an empty host name "
+"(Windows only)"
+msgstr ""
+"호스트 이름이 비어 있는 443 바인딩의 인증서도 함께 업데이트합니다 (Windows 전"
+"용)"
+
+#: core_cert/models.py:160
+msgid ""
+"Names of Docker containers to restart after deployment (Linux & Windows)"
+msgstr "배포 후 재시작할 Docker 컨테이너 이름 (Linux·Windows 공통)"
+
+#: core_cert/models.py:168
+msgid "Fullchain (fullchain.cer/pem)"
+msgstr "전체 체인 (fullchain.cer/pem)"
+
+#: core_cert/models.py:169
+msgid "Private Key (.key/pem)"
+msgstr "개인키 (.key/pem)"
+
+#: core_cert/models.py:170
+msgid "Certificate (.cer/pem)"
+msgstr "인증서 (.cer/pem)"
+
+#: core_cert/models.py:171
+msgid "Intermediate chain (domain_chain.cer)"
+msgstr "중간 CA 체인 (domain_chain.cer)"
+
+#: core_cert/models.py:172
+msgid "Intermediate chain — AAA cross-sign, legacy (ZeroSSL)"
+msgstr "중간 CA 체인 — AAA 교차 서명, 구형 기기용 (ZeroSSL)"
+
+#: core_cert/models.py:173
+msgid "Intermediate chain — USERTrust cross-sign, legacy (ZeroSSL)"
+msgstr "중간 CA 체인 — USERTrust 교차 서명, 구형 기기용 (ZeroSSL)"
+
+#: core_cert/models.py:174
+msgid "PFX (cert.pfx)"
+msgstr "PFX (cert.pfx)"
+
+#: core_cert/models.py:175
+msgid "Root CA chain (domain_RootCA.pem)"
+msgstr "Root CA 체인 (domain_RootCA.pem)"
+
+#: core_cert/models.py:178
+msgid "If empty, default filename will be used."
+msgstr "비워둘 경우 기본 파일명이 사용됩니다."
+
+#: core_cert/models.py:179
+msgid ""
+"If set, this file is sent to this specific path instead of the target's "
+"common path. The directory is created automatically. (Linux & Windows)"
+msgstr ""
+"지정하면 대상 서버의 공통 경로 대신 이 특정 경로로 파일을 전송합니다. 디렉토"
+"리는 자동으로 생성됩니다. (Linux·Windows 공통)"
+
+#: core_cert/templates/core_cert/certificate_action.html:42
+msgid "Live execution log"
+msgstr "실시간 실행 로그"
+
+#: core_cert/templates/core_cert/certificate_action.html:45
+msgid "Click the button above to start."
+msgstr "작업을 시작하려면 위 버튼을 클릭하세요..."
+
+#: core_cert/templates/core_cert/certificate_action.html:47
+msgid "This is a manual certificate. Issuance and renewal are disabled."
+msgstr "이 인증서는 수동 인증서입니다. 발급 및 갱신이 제한됩니다."
+
+#: core_cert/templates/core_cert/certificate_action.html:48
+msgid "To renew, go to Edit and upload a new ZIP file for manual renewal."
+msgstr "갱신하려면 [수정]에서 ZIP 파일을 선택해 수동 갱신해 주세요."
+
+#: core_cert/templates/core_cert/certificate_form.html:4
+#: core_cert/templates/core_cert/certificate_form.html:10
+msgid "Edit Certificate"
+msgstr "인증서 편집"
+
+#: core_cert/templates/core_cert/certificate_form.html:4
+#: core_cert/templates/core_cert/certificate_list.html:11
+msgid "Add Certificate"
+msgstr "인증서 추가"
+
+#: core_cert/templates/core_cert/certificate_form.html:12
+msgid "Register New Certificate"
+msgstr "새 인증서 등록"
+
+#: core_cert/templates/core_cert/certificate_form.html:15
+#: core_cert/templates/core_cert/server_form.html:15
+msgid "Back to List"
+msgstr "목록으로 돌아가기"
+
+#: core_cert/templates/core_cert/certificate_form.html:35
+msgid "(Optional — distinguishes certs with the same domain)"
+msgstr "(선택 — 같은 도메인의 인증서를 구분합니다)"
+
+#: core_cert/templates/core_cert/certificate_form.html:41
+msgid "Domain (FQDN)"
+msgstr "도메인 (FQDN)"
+
+#: core_cert/templates/core_cert/certificate_form.html:45
+msgid "acme.sh Path"
+msgstr "acme.sh 경로"
+
+#: core_cert/templates/core_cert/certificate_form.html:61
+msgid "DNS Provider"
+msgstr "DNS 제공자"
+
+#: core_cert/templates/core_cert/certificate_form.html:71
+msgid ""
+"Upload a ZIP containing the certificate, key and fullchain files. It will be "
+"extracted into"
+msgstr ""
+"인증서, 키, fullchain 파일이 포함된 ZIP을 업로드하세요. 다음 경로에 압축 해제"
+"됩니다"
+
+#: core_cert/templates/core_cert/certificate_form.html:74
+msgid "When you upload a new ZIP, the current files are backed up to the"
+msgstr "새 ZIP을 업로드하면 현재 파일들이 다음 폴더로 백업됩니다:"
+
+#: core_cert/templates/core_cert/certificate_form.html:74
+msgid "folder (only the most recent backup is kept)."
+msgstr "폴더 (직전 1개만 보관됩니다)."
+
+#: core_cert/templates/core_cert/certificate_form.html:81
+msgid "Previous certificate (backup)"
+msgstr "이전 인증서 (백업)"
+
+#: core_cert/templates/core_cert/certificate_form.html:85
+msgid "Backed up at"
+msgstr "백업 시각"
+
+#: core_cert/templates/core_cert/certificate_form.html:85
+msgid "unknown"
+msgstr "알 수 없음"
+
+#: core_cert/templates/core_cert/certificate_form.html:86
+msgid "files"
+msgstr "개 파일"
+
+#: core_cert/templates/core_cert/certificate_form.html:90
+msgid ""
+"Restore to the previous certificate? The current files will be swapped with "
+"the backup."
+msgstr "이전 인증서로 복구하시겠습니까? 현재 파일은 백업과 교체됩니다."
+
+#: core_cert/templates/core_cert/certificate_form.html:91
+msgid "Restore previous certificate"
+msgstr "이전 인증서로 복구"
+
+#: core_cert/templates/core_cert/certificate_form.html:95
+msgid "Does not exist."
+msgstr "존재하지 않습니다."
+
+#: core_cert/templates/core_cert/certificate_form.html:102
+msgid "Assign Certificate Files"
+msgstr "인증서 파일 지정"
+
+#: core_cert/templates/core_cert/certificate_form.html:104
+msgid ""
+"The following files were found. Confirm or change the mapping, then save to "
+"generate the PFX."
+msgstr ""
+"다음 파일을 찾았습니다. 매핑을 확인하거나 변경한 뒤 저장하면 PFX가 생성됩니"
+"다."
+
+#: core_cert/templates/core_cert/certificate_form.html:107
+#: core_cert/templates/core_cert/ssh_key_manage.html:41
+msgid "Private Key"
+msgstr "비밀키"
+
+#: core_cert/templates/core_cert/certificate_form.html:109
+msgid "-- select --"
+msgstr "-- 선택 --"
+
+#: core_cert/templates/core_cert/certificate_form.html:116
+msgid "Certificate (leaf)"
+msgstr "인증서 (leaf)"
+
+#: core_cert/templates/core_cert/certificate_form.html:118
+msgid "-- auto (from fullchain) --"
+msgstr "-- 자동 (fullchain에서 추출) --"
+
+#: core_cert/templates/core_cert/certificate_form.html:125
+msgid "Fullchain"
+msgstr "Fullchain"
+
+#: core_cert/templates/core_cert/certificate_form.html:127
+msgid "-- auto-generate (leaf + CA) --"
+msgstr "-- 자동 생성 (leaf + CA) --"
+
+#: core_cert/templates/core_cert/certificate_form.html:134
+msgid "Intermediate chain"
+msgstr "중간 CA 체인"
+
+#: core_cert/templates/core_cert/certificate_form.html:136
+msgid "-- auto (intermediate only) --"
+msgstr "-- 자동 (중간 CA만) --"
+
+#: core_cert/templates/core_cert/certificate_form.html:144
+msgid "Legend"
+msgstr "범례"
+
+#: core_cert/templates/core_cert/certificate_form.html:144
+msgid "domain certificate"
+msgstr "도메인 인증서"
+
+#: core_cert/templates/core_cert/certificate_form.html:144
+msgid "leaf + chain"
+msgstr "leaf + 체인"
+
+#: core_cert/templates/core_cert/certificate_form.html:144
+msgid "Root/CA bundle"
+msgstr "Root/CA 번들"
+
+#: core_cert/templates/core_cert/certificate_form.html:144
+msgid "private key"
+msgstr "개인 키"
+
+#: core_cert/templates/core_cert/certificate_form.html:145
+msgid ""
+"If you don't pick a fullchain, one will be built from the leaf and CA files."
+msgstr "fullchain을 선택하지 않으면 leaf와 CA 파일로 자동 생성됩니다."
+
+#: core_cert/templates/core_cert/certificate_form.html:146
+msgid ""
+"The intermediate chain (for Apache SSLCertificateChainFile) excludes the "
+"leaf and root; if not picked it is auto-extracted."
+msgstr ""
+"중간 CA 체인(Apache SSLCertificateChainFile용)은 leaf와 루트를 제외합니다. 선"
+"택하지 않으면 자동으로 추출됩니다."
+
+#: core_cert/templates/core_cert/certificate_form.html:149
+msgid "Intermediate chain present"
+msgstr "중간 CA 체인 존재함"
+
+#: core_cert/templates/core_cert/certificate_form.html:152
+msgid "PFX present"
+msgstr "PFX 존재함"
+
+#: core_cert/templates/core_cert/certificate_form.html:152
+msgid "password"
+msgstr "비밀번호"
+
+#: core_cert/templates/core_cert/certificate_form.html:156
+msgid "Regenerate files (chain / RootCA / PFX)"
+msgstr "파일 재생성 (chain / RootCA / PFX)"
+
+#: core_cert/templates/core_cert/certificate_form.html:157
+msgid ""
+"Rebuilds chain / RootCA / PFX from the certificate files above. PFX password "
+"is fixed to"
+msgstr ""
+"위에 지정한 인증서 파일을 기준으로 chain / RootCA / PFX를 다시 만듭니다. PFX "
+"비밀번호는 다음으로 고정됩니다:"
+
+#: core_cert/templates/core_cert/certificate_form.html:161
+msgid "No files found in the certificate folder yet. Upload a ZIP above."
+msgstr "인증서 폴더에 아직 파일이 없습니다. 위에서 ZIP을 업로드하세요."
+
+#: core_cert/templates/core_cert/certificate_form.html:170
+msgid "Wildcard Certificate"
+msgstr "와일드카드 인증서"
+
+#: core_cert/templates/core_cert/certificate_form.html:178
+msgid "Expiry Date"
+msgstr "만료일"
+
+#: core_cert/templates/core_cert/certificate_form.html:182
+#: core_cert/templates/core_cert/dashboard.html:63
+#: core_cert/templates/core_cert/dashboard.html:184
+#: core_cert/templates/core_cert/server_list.html:152
+msgid "Status"
+msgstr "상태"
+
+#: core_cert/templates/core_cert/certificate_form.html:186
+msgid "Valid"
+msgstr "유효함"
+
+#: core_cert/templates/core_cert/certificate_form.html:188
+#: core_cert/templates/core_cert/dashboard.html:21
+msgid "Expired"
+msgstr "만료됨"
+
+#: core_cert/templates/core_cert/certificate_form.html:201
+#: core_cert/templates/core_cert/server_form.html:73
+#: core_cert/templates/core_cert/settings.html:26
+#: core_cert/templates/core_cert/settings.html:37
+#: core_cert/templates/core_cert/settings.html:54
+#: core_cert/templates/core_cert/settings.html:71
+#: core_cert/templates/core_cert/settings.html:82
+msgid "Save"
+msgstr "저장"
+
+#: core_cert/templates/core_cert/certificate_form.html:203
+msgid "Setup acme.sh Hook"
+msgstr "acme.sh 훅 설정"
+
+#: core_cert/templates/core_cert/certificate_form.html:211
+msgid "Connected Deployment Scripts"
+msgstr "연결된 배포 스크립트"
+
+#: core_cert/templates/core_cert/certificate_form.html:216
+#: core_cert/templates/core_cert/dashboard.html:152
+#: core_cert/templates/core_cert/script_list.html:26
+msgid "Script Name"
+msgstr "스크립트 이름"
+
+#: core_cert/templates/core_cert/certificate_form.html:217
+#: core_cert/templates/core_cert/dashboard.html:26
+msgid "Target Servers"
+msgstr "대상 서버"
+
+#: core_cert/templates/core_cert/certificate_form.html:218
+#: core_cert/templates/core_cert/certificate_list.html:59
+#: core_cert/templates/core_cert/dashboard.html:66
+#: core_cert/templates/core_cert/dashboard.html:154
+#: core_cert/templates/core_cert/script_list.html:30
+#: core_cert/templates/core_cert/server_list.html:32
+msgid "Actions"
+msgstr "작업"
+
+#: core_cert/templates/core_cert/certificate_form.html:231
+#: core_cert/templates/core_cert/certificate_list.html:130
+msgid "No target servers"
+msgstr "대상 서버 없음"
+
+#: core_cert/templates/core_cert/certificate_form.html:235
+#: core_cert/templates/core_cert/dashboard.html:162
+#: core_cert/templates/core_cert/script_list.html:50
+msgid "Run"
+msgstr "실행"
+
+#: core_cert/templates/core_cert/certificate_form.html:242
+msgid "No connected scripts."
+msgstr "연결된 스크립트가 없습니다."
+
+#: core_cert/templates/core_cert/certificate_form.html:342
+msgid "Regenerating..."
+msgstr "재생성 중..."
+
+#: core_cert/templates/core_cert/certificate_form.html:343
+msgid "Regeneration result"
+msgstr "재생성 결과"
+
+#: core_cert/templates/core_cert/certificate_form.html:344
+msgid ""
+"File regeneration failed. Make sure the certificate files are assigned and "
+"saved first."
+msgstr ""
+"파일 재생성에 실패했습니다. 인증서 파일을 먼저 지정하고 저장했는지 확인하세"
+"요."
+
+#: core_cert/templates/core_cert/certificate_form.html:379
+msgid "Restoring..."
+msgstr "복구 중..."
+
+#: core_cert/templates/core_cert/certificate_form.html:380
+msgid "Restore failed."
+msgstr "복구에 실패했습니다."
+
+#: core_cert/templates/core_cert/certificate_list.html:4
+msgid "Certificates & Deployment"
+msgstr "인증서 및 배포"
+
+#: core_cert/templates/core_cert/certificate_list.html:8
+msgid "Certificate & Deployment Management"
+msgstr "인증서 및 배포 관리"
+
+#: core_cert/templates/core_cert/certificate_list.html:10
+msgid "Full Sync & Auto Hook"
+msgstr "전체 동기화 및 자동 훅"
+
+#: core_cert/templates/core_cert/certificate_list.html:20
+msgid "Auto Renewal & Deployment Schedule"
+msgstr "자동 갱신 및 배포 일정"
+
+#: core_cert/templates/core_cert/certificate_list.html:22
+msgid "Last Check"
+msgstr "마지막 확인"
+
+#: core_cert/templates/core_cert/certificate_list.html:22
+#: core_cert/templates/core_cert/settings.html:115
+msgid "No Record"
+msgstr "기록 없음"
+
+#: core_cert/templates/core_cert/certificate_list.html:24
+msgid "Next run in"
+msgstr "다음 실행까지"
+
+#: core_cert/templates/core_cert/certificate_list.html:29
+#: core_cert/templates/core_cert/dashboard.html:65
+#: core_cert/templates/core_cert/dashboard.html:185
+msgid "Time"
+msgstr "시간"
+
+#: core_cert/templates/core_cert/certificate_list.html:31
+#: core_cert/templates/core_cert/certificate_list.html:38
+msgid "Set"
+msgstr "설정"
+
+#: core_cert/templates/core_cert/certificate_list.html:36
+msgid "Renewal D-Day"
+msgstr "갱신 D-Day"
+
+#: core_cert/templates/core_cert/certificate_list.html:43
+msgid ""
+"Check all certificates for renewal and perform deployment now? (May take "
+"several minutes)"
+msgstr ""
+"모든 인증서의 갱신을 확인하고 지금 배포를 수행하시겠습니까? (몇 분 정도 소요"
+"될 수 있습니다)"
+
+#: core_cert/templates/core_cert/certificate_list.html:43
+msgid "Run Check Now"
+msgstr "지금 확인 실행"
+
+#: core_cert/templates/core_cert/certificate_list.html:56
+#: core_cert/templates/core_cert/server_list.html:150
+msgid "Domain"
+msgstr "도메인"
+
+#: core_cert/templates/core_cert/certificate_list.html:57
+msgid "Status (Expiry)"
+msgstr "상태 (만료)"
+
+#: core_cert/templates/core_cert/certificate_list.html:58
+msgid "Scripts & Servers"
+msgstr "스크립트 및 서버"
+
+#: core_cert/templates/core_cert/certificate_list.html:77
+msgid "Manual"
+msgstr "수동"
+
+#: core_cert/templates/core_cert/certificate_list.html:79
+msgid "Staging"
+msgstr "스테이징"
+
+#: core_cert/templates/core_cert/certificate_list.html:84
+msgid "Wildcard"
+msgstr "와일드카드"
+
+#: core_cert/templates/core_cert/certificate_list.html:99
+msgid "Expiry"
+msgstr "만료"
+
+#: core_cert/templates/core_cert/certificate_list.html:105
+msgid "Renewal"
+msgstr "갱신"
+
+#: core_cert/templates/core_cert/certificate_list.html:112
+msgid "No Info"
+msgstr "정보 없음"
+
+#: core_cert/templates/core_cert/certificate_list.html:135
+msgid "No connected scripts"
+msgstr "연결된 스크립트 없음"
+
+#: core_cert/templates/core_cert/certificate_list.html:141
+msgid "Issue test certificate (using staging server)"
+msgstr "테스트 인증서 발급 (스테이징 서버 사용)"
+
+#: core_cert/templates/core_cert/certificate_list.html:141
+msgid "Test"
+msgstr "테스트 발급"
+
+#: core_cert/templates/core_cert/certificate_list.html:142
+msgid "Issue new certificate or change settings"
+msgstr "새 인증서 발급 또는 설정 변경"
+
+#: core_cert/templates/core_cert/certificate_list.html:142
+msgid "Issue"
+msgstr "발급"
+
+#: core_cert/templates/core_cert/certificate_list.html:144
+msgid "Renew with existing settings"
+msgstr "기존 설정으로 갱신"
+
+#: core_cert/templates/core_cert/certificate_list.html:144
+msgid "Renew"
+msgstr "갱신"
+
+#: core_cert/templates/core_cert/certificate_list.html:147
+msgid ""
+"Manual certificate: issuance/renewal is disabled. Renew it by editing and "
+"uploading a new ZIP file."
+msgstr ""
+"수동 인증서: 발급/갱신이 제한됩니다. [수정]에서 새 ZIP 파일을 업로드해 갱신하"
+"세요."
+
+#: core_cert/templates/core_cert/certificate_list.html:147
+msgid "Manual (renew via Edit)"
+msgstr "수동 (수정에서 갱신)"
+
+#: core_cert/templates/core_cert/certificate_list.html:149
+#: core_cert/templates/core_cert/script_list.html:51
+#: core_cert/templates/core_cert/server_list.html:69
+msgid "Edit"
+msgstr "수정"
+
+#: core_cert/templates/core_cert/certificate_list.html:150
+#: core_cert/templates/core_cert/dashboard.html:89
+#: core_cert/templates/core_cert/script_list.html:52
+#: core_cert/templates/core_cert/server_list.html:12
+#: core_cert/templates/core_cert/server_list.html:70
+msgid "Delete"
+msgstr "삭제"
+
+#: core_cert/templates/core_cert/certificate_list.html:156
+msgid "No domains registered. Try [Full Sync]."
+msgstr "등록된 도메인이 없습니다. [전체 동기화]를 시도해 보세요."
+
+#: core_cert/templates/core_cert/certificate_list.html:173
+msgid "No Challenge Info"
+msgstr "챌린지 정보 없음"
+
+#: core_cert/templates/core_cert/certificate_list.html:180
+msgid ""
+"Please add the following CNAME record to your DNS settings for certificate "
+"issuance."
+msgstr "인증서 발급을 위해 다음 CNAME 레코드를 DNS 설정에 추가해 주세요."
+
+#: core_cert/templates/core_cert/certificate_list.html:184
+msgid "Domain (Host)"
+msgstr "도메인 (호스트)"
+
+#: core_cert/templates/core_cert/certificate_list.html:187
+#: core_cert/templates/core_cert/certificate_list.html:195
+#: core_cert/templates/core_cert/ssh_key_manage.html:22
+msgid "Copy"
+msgstr "복사"
+
+#: core_cert/templates/core_cert/certificate_list.html:192
+msgid "Value (Target)"
+msgstr "값 (대상)"
+
+#: core_cert/templates/core_cert/certificate_list.html:201
+msgid "DNS Challenge Info"
+msgstr "DNS 챌린지 정보"
+
+#: core_cert/templates/core_cert/certificate_list.html:204
+#: core_cert/templates/core_cert/server_list.html:136
+#: core_cert/templates/core_cert/server_list.html:169
+#: core_cert/templates/core_cert/server_list.html:203
+msgid "Error"
+msgstr "오류"
+
+#: core_cert/templates/core_cert/certificate_list.html:204
+msgid "Failed to fetch information."
+msgstr "정보를 가져오지 못했습니다."
+
+#: core_cert/templates/core_cert/certificate_list.html:217
+msgid "Done!"
+msgstr "완료!"
+
+#: core_cert/templates/core_cert/confirm_delete.html:4
+msgid "Confirm Delete"
+msgstr "삭제 확인"
+
+#: core_cert/templates/core_cert/confirm_delete.html:11
+msgid "Are you sure you want to delete?"
+msgstr "정말로 삭제하시겠습니까?"
+
+#: core_cert/templates/core_cert/confirm_delete.html:14
+#, python-format
+msgid ""
+"\n"
+"            Are you sure you want to delete <strong>%(name)s</strong>?<br>\n"
+"            This action cannot be undone.\n"
+"            "
+msgstr ""
+"\n"
+"            정말로 <strong>%(name)s</strong>을(를) 삭제하시겠습니까?<br>\n"
+"            이 작업은 되돌릴 수 없습니다.\n"
+"            "
+
+#: core_cert/templates/core_cert/confirm_delete.html:27
+msgid "Delete physical certificate files (acme.sh folder)"
+msgstr "실제 인증서 파일 삭제 (acme.sh 폴더)"
+
+#: core_cert/templates/core_cert/confirm_delete.html:30
+msgid ""
+"Warning: This will permanently remove the certificate folder from the server."
+msgstr "주의: 이 작업은 서버에서 인증서 폴더를 영구적으로 제거합니다."
+
+#: core_cert/templates/core_cert/confirm_delete.html:36
+#: core_cert/templates/core_cert/server_form.html:74
+#: core_cert/templates/core_cert/server_ssh_setup.html:35
+#: templates/base.html:89
+msgid "Cancel"
+msgstr "취소"
+
+#: core_cert/templates/core_cert/confirm_delete.html:37
+msgid "Delete Now"
+msgstr "지금 삭제"
+
+#: core_cert/templates/core_cert/dashboard.html:4 templates/base.html:62
+msgid "Dashboard"
+msgstr "대시보드"
+
+#: core_cert/templates/core_cert/dashboard.html:8
+msgid "System Dashboard"
+msgstr "시스템 대시보드"
+
+#: core_cert/templates/core_cert/dashboard.html:10
+msgid "Certificate Management"
+msgstr "인증서 관리"
+
+#: core_cert/templates/core_cert/dashboard.html:11
+#: core_cert/templates/core_cert/settings.html:4
+#: core_cert/templates/core_cert/settings.html:8
+msgid "System Settings"
+msgstr "시스템 설정"
+
+#: core_cert/templates/core_cert/dashboard.html:18
+msgid "Total Certificates"
+msgstr "총 인증서"
+
+#: core_cert/templates/core_cert/dashboard.html:22
+msgid "Expiring Soon"
+msgstr "곧 만료"
+
+#: core_cert/templates/core_cert/dashboard.html:29
+msgid "Healthy"
+msgstr "정상"
+
+#: core_cert/templates/core_cert/dashboard.html:34
+msgid "Unresolved Failures"
+msgstr "해결되지 않은 실패"
+
+#: core_cert/templates/core_cert/dashboard.html:35
+msgid " items"
+msgstr " 항목"
+
+#: core_cert/templates/core_cert/dashboard.html:36
+msgid "Deployment tasks needing attention (Total)"
+msgstr "주의가 필요한 배포 작업 (전체)"
+
+#: core_cert/templates/core_cert/dashboard.html:45
+msgid "Unresolved Deployment Failures"
+msgstr "해결되지 않은 배포 실패"
+
+#: core_cert/templates/core_cert/dashboard.html:48
+#: core_cert/templates/core_cert/script_detail.html:26
+msgid "Resolve Selected"
+msgstr "선택된 항목 해결 처리"
+
+#: core_cert/templates/core_cert/dashboard.html:49
+#: core_cert/templates/core_cert/script_detail.html:27
+msgid "Delete Selected"
+msgstr "선택된 항목 삭제"
+
+#: core_cert/templates/core_cert/dashboard.html:62
+msgid "Script (Domain)"
+msgstr "스크립트 (도메인)"
+
+#: core_cert/templates/core_cert/dashboard.html:64
+msgid "Error Summary"
+msgstr "오류 요약"
+
+#: core_cert/templates/core_cert/dashboard.html:88
+msgid "Resolved"
+msgstr "해결됨"
+
+#: core_cert/templates/core_cert/dashboard.html:89
+#: core_cert/templates/core_cert/script_detail.html:89
+msgid "Delete this log?"
+msgstr "이 로그를 삭제하시겠습니까?"
+
+#: core_cert/templates/core_cert/dashboard.html:128
+#: core_cert/templates/core_cert/script_detail.html:177
+msgid "Delete selected "
+msgstr "선택된 항목 삭제 "
+
+#: core_cert/templates/core_cert/dashboard.html:128
+#: core_cert/templates/core_cert/script_detail.html:177
+msgid " logs?"
+msgstr " 로그를 삭제하시겠습니까?"
+
+#: core_cert/templates/core_cert/dashboard.html:128
+#: core_cert/templates/core_cert/script_detail.html:177
+msgid "Mark selected "
+msgstr "선택된 항목 마크 "
+
+#: core_cert/templates/core_cert/dashboard.html:128
+#: core_cert/templates/core_cert/script_detail.html:177
+msgid " logs as resolved?"
+msgstr " 로그를 해결된 것으로 표시하시겠습니까?"
+
+#: core_cert/templates/core_cert/dashboard.html:146
+#: core_cert/templates/core_cert/script_list.html:4
+#: core_cert/templates/core_cert/script_list.html:8
+msgid "Deployment Scripts"
+msgstr "배포 스크립트"
+
+#: core_cert/templates/core_cert/dashboard.html:153
+msgid "Target Domain"
+msgstr "대상 도메인"
+
+#: core_cert/templates/core_cert/dashboard.html:166
+#: core_cert/templates/core_cert/script_list.html:58
+msgid "No scripts registered."
+msgstr "등록된 스크립트가 없습니다."
+
+#: core_cert/templates/core_cert/dashboard.html:177
+msgid "Recent Deployment Logs"
+msgstr "최근 배포 로그"
+
+#: core_cert/templates/core_cert/dashboard.html:183
+msgid "Script"
+msgstr "스크립트"
+
+#: core_cert/templates/core_cert/dashboard.html:201
+msgid "No recent logs."
+msgstr "최근 로그가 없습니다."
+
+#: core_cert/templates/core_cert/dashboard.html:212
+msgid "Need to change system settings?"
+msgstr "시스템 설정을 변경해야 합니까?"
+
+#: core_cert/templates/core_cert/dashboard.html:212
+msgid "Go to Settings Management"
+msgstr "설정 관리로 이동"
+
+#: core_cert/templates/core_cert/dashboard.html:212
+msgid "to update auto-renewal time and API information."
+msgstr "하여 자동 갱신 시간 및 API 정보를 업데이트하세요."
+
+#: core_cert/templates/core_cert/script_detail.html:4
+msgid "Deployment"
+msgstr "배포"
+
+#: core_cert/templates/core_cert/script_detail.html:8
+msgid "Script Info"
+msgstr "스크립트 정보"
+
+#: core_cert/templates/core_cert/script_detail.html:9
+#: core_cert/templates/core_cert/script_list.html:27
+msgid "Connected Domain"
+msgstr "연결된 도메인"
+
+#: core_cert/templates/core_cert/script_detail.html:10
+msgid "Start Deployment"
+msgstr "배포 시작"
+
+#: core_cert/templates/core_cert/script_detail.html:14
+msgid "Real-time Deployment Logs"
+msgstr "실시간 배포 로그"
+
+#: core_cert/templates/core_cert/script_detail.html:16
+msgid "Click the button above to start deployment..."
+msgstr "배포를 시작하려면 위의 버튼을 클릭하세요..."
+
+#: core_cert/templates/core_cert/script_detail.html:23
+msgid "Execution History"
+msgstr "실행 이력"
+
+#: core_cert/templates/core_cert/script_detail.html:38
+msgid "Select All"
+msgstr "전체 선택"
+
+#: core_cert/templates/core_cert/script_detail.html:57
+msgid "Site applied successfully"
+msgstr "사이트에 성공적으로 적용됨"
+
+#: core_cert/templates/core_cert/script_detail.html:59
+msgid "Certificate mismatch on site"
+msgstr "사이트 인증서 불일치"
+
+#: core_cert/templates/core_cert/script_detail.html:62
+msgid "Verification skipped (no matching site found)"
+msgstr "검증 건너뜀 (매칭되는 사이트 없음)"
+
+#: core_cert/templates/core_cert/script_detail.html:64
+msgid "Failed to connect to site"
+msgstr "사이트 연결 실패"
+
+#: core_cert/templates/core_cert/script_detail.html:78
+msgid "Success"
+msgstr "성공"
+
+#: core_cert/templates/core_cert/script_detail.html:78
+msgid "Failure"
+msgstr "실패"
+
+#: core_cert/templates/core_cert/script_detail.html:87
+msgid "Mark as Resolved"
+msgstr "해결됨으로 표시"
+
+#: core_cert/templates/core_cert/script_detail.html:89
+msgid "Delete Log"
+msgstr "로그 삭제"
+
+#: core_cert/templates/core_cert/script_detail.html:95
+msgid "No execution history."
+msgstr "실행 이력이 없습니다."
+
+#: core_cert/templates/core_cert/script_detail.html:124
+#: core_cert/templates/core_cert/script_detail.html:144
+msgid "System"
+msgstr "시스템"
+
+#: core_cert/templates/core_cert/script_detail.html:124
+msgid "Connected to deployment server."
+msgstr "배포 서버에 연결됨."
+
+#: core_cert/templates/core_cert/script_detail.html:144
+msgid "Sending deployment request..."
+msgstr "배포 요청을 보내는 중..."
+
+#: core_cert/templates/core_cert/script_form.html:113
+#: core_cert/templates/core_cert/script_form.html:180
+msgid "Restart Docker Containers"
+msgstr "Docker 컨테이너 재시작"
+
+#: core_cert/templates/core_cert/script_form.html:114
+#: core_cert/templates/core_cert/script_form.html:181
+msgid "Refresh"
+msgstr "새로고침"
+
+#: core_cert/templates/core_cert/script_form.html:117
+#: core_cert/templates/core_cert/script_form.html:184
+#: core_cert/templates/core_cert/script_form.html:668
+msgid "Click Refresh to load running containers (docker ps over SSH)."
+msgstr ""
+"새로고침을 누르면 실행 중인 컨테이너 목록을 불러옵니다 (SSH로 docker ps 실"
+"행)."
+
+#: core_cert/templates/core_cert/script_form.html:581
+msgid "Select a server first."
+msgstr "먼저 서버를 선택하세요."
+
+#: core_cert/templates/core_cert/script_form.html:582
+msgid "Loading containers..."
+msgstr "컨테이너 불러오는 중..."
+
+#: core_cert/templates/core_cert/script_form.html:588
+msgid "No running containers found."
+msgstr "실행 중인 컨테이너가 없습니다."
+
+#: core_cert/templates/core_cert/script_form.html:590
+#: core_cert/templates/core_cert/script_form.html:593
+msgid "Failed to load:"
+msgstr "불러오기 실패:"
+
+#: core_cert/templates/core_cert/script_list.html:10
+msgid "Back"
+msgstr "뒤로"
+
+#: core_cert/templates/core_cert/script_list.html:11
+msgid "Add Script"
+msgstr "스크립트 추가"
+
+#: core_cert/templates/core_cert/script_list.html:28
+msgid "Targets"
+msgstr "대상"
+
+#: core_cert/templates/core_cert/script_list.html:29
+msgid "Last Executed"
+msgstr "마지막 실행"
+
+#: core_cert/templates/core_cert/script_list.html:43 templates/base.html:64
+msgid "Servers"
+msgstr "서버 관리"
+
+#: core_cert/templates/core_cert/script_list.html:46
+msgid "No History"
+msgstr "이력 없음"
+
+#: core_cert/templates/core_cert/server_form.html:4
+#: core_cert/templates/core_cert/server_form.html:10
+msgid "Edit Server"
+msgstr "서버 편집"
+
+#: core_cert/templates/core_cert/server_form.html:4
+#: core_cert/templates/core_cert/server_list.html:15
+msgid "Add Server"
+msgstr "서버 추가"
+
+#: core_cert/templates/core_cert/server_form.html:12
+msgid "Register New Target Server"
+msgstr "새 대상 서버 등록"
+
+#: core_cert/templates/core_cert/server_form.html:24
+#: core_cert/templates/core_cert/server_list.html:28
+msgid "Server Name"
+msgstr "서버 이름"
+
+#: core_cert/templates/core_cert/server_form.html:28
+msgid "IP Address"
+msgstr "IP 주소"
+
+#: core_cert/templates/core_cert/server_form.html:35
+msgid "SSH User"
+msgstr "SSH 사용자"
+
+#: core_cert/templates/core_cert/server_form.html:39
+msgid "SSH Port"
+msgstr "SSH 포트"
+
+#: core_cert/templates/core_cert/server_form.html:46
+msgid "OS Type"
+msgstr "OS 유형"
+
+#: core_cert/templates/core_cert/server_form.html:50
+msgid "Web Server"
+msgstr "웹 서버"
+
+#: core_cert/templates/core_cert/server_form.html:57
+msgid "Path Mode"
+msgstr "경로 모드"
+
+#: core_cert/templates/core_cert/server_form.html:67
+msgid "SSL Config File Path"
+msgstr "SSL 설정 파일 경로"
+
+#: core_cert/templates/core_cert/server_form.html:69
+msgid "For site test verification. e.g., /etc/httpd/conf.d/ssl.conf"
+msgstr "사이트 테스트 검증용. 예: /etc/httpd/conf.d/ssl.conf"
+
+#: core_cert/templates/core_cert/server_list.html:4
+#: core_cert/templates/core_cert/server_list.html:8
+msgid "Server Management"
+msgstr "서버 관리"
+
+#: core_cert/templates/core_cert/server_list.html:11
+#: core_cert/templates/core_cert/server_list.html:99
+msgid "selected"
+msgstr "선택됨"
+
+#: core_cert/templates/core_cert/server_list.html:13
+#: core_cert/templates/core_cert/server_list.html:68
+msgid "Site Test"
+msgstr "사이트 테스트"
+
+#: core_cert/templates/core_cert/server_list.html:29
+msgid "IP / SSH"
+msgstr "IP / SSH"
+
+#: core_cert/templates/core_cert/server_list.html:30
+msgid "OS / WebServer"
+msgstr "OS / 웹서버"
+
+#: core_cert/templates/core_cert/server_list.html:31
+msgid "SSH Status"
+msgstr "SSH 상태"
+
+#: core_cert/templates/core_cert/server_list.html:66
+msgid "Setup SSH public key on target server"
+msgstr "대상 서버에 SSH 공개키 설정"
+
+#: core_cert/templates/core_cert/server_list.html:66
+msgid "Keys"
+msgstr "키 등록"
+
+#: core_cert/templates/core_cert/server_list.html:67
+msgid "SSH connection test"
+msgstr "SSH 연결 테스트"
+
+#: core_cert/templates/core_cert/server_list.html:67
+msgid "SSH Test"
+msgstr "SSH 테스트"
+
+#: core_cert/templates/core_cert/server_list.html:68
+msgid "Site certificate verification"
+msgstr "사이트 인증서 검증"
+
+#: core_cert/templates/core_cert/server_list.html:76
+msgid "No servers registered."
+msgstr "등록된 서버가 없습니다."
+
+#: core_cert/templates/core_cert/server_list.html:116
+msgid "Are you sure you want to delete selected "
+msgstr "선택한 서버를 삭제하시겠습니까? "
+
+#: core_cert/templates/core_cert/server_list.html:116
+msgid " servers? Connected deployment scripts may be affected."
+msgstr " 연결된 배포 스크립트에 영향을 줄 수 있습니다."
+
+#: core_cert/templates/core_cert/server_list.html:121
+msgid "Selected servers"
+msgstr "선택된 서버"
+
+#: core_cert/templates/core_cert/server_list.html:127
+msgid "Verifying sites..."
+msgstr "사이트 검증 중..."
+
+#: core_cert/templates/core_cert/server_list.html:127
+msgid "Analyzing and verifying domains on "
+msgstr "다음 서버에서 도메인 분석 및 검증 중: "
+
+#: core_cert/templates/core_cert/server_list.html:127
+msgid "May take several minutes depending on the number of servers."
+msgstr "서버 수에 따라 몇 분 정도 소요될 수 있습니다."
+
+#: core_cert/templates/core_cert/server_list.html:151
+msgid "Port"
+msgstr "포트"
+
+#: core_cert/templates/core_cert/server_list.html:153
+msgid "Expiry (Site)"
+msgstr "만료 (사이트)"
+
+#: core_cert/templates/core_cert/server_list.html:160
+#: core_cert/templates/core_cert/server_list.html:163
+msgid "Match"
+msgstr "일치"
+
+#: core_cert/templates/core_cert/server_list.html:160
+#: core_cert/templates/core_cert/server_list.html:167
+msgid "Mismatch"
+msgstr "불일치"
+
+#: core_cert/templates/core_cert/server_list.html:164
+#: core_cert/templates/core_cert/server_list.html:165
+msgid "Unmanaged"
+msgstr "관리되지 않음"
+
+#: core_cert/templates/core_cert/server_list.html:177
+msgid "Not in system"
+msgstr "시스템에 없음"
+
+#: core_cert/templates/core_cert/server_list.html:189
+msgid "No domains found."
+msgstr "도메인을 찾을 수 없습니다."
+
+#: core_cert/templates/core_cert/server_list.html:196
+msgid ""
+"To exclude a domain from this list, add the following comment in its config "
+"block (VirtualHost or server):"
+msgstr ""
+"이 목록에서 도메인을 제외하려면 설정 블록(VirtualHost 또는 server)에 다음 주"
+"석을 추가하세요:"
+
+#: core_cert/templates/core_cert/server_list.html:200
+msgid "Integrated Verification Result"
+msgstr "통합 검증 결과"
+
+#: core_cert/templates/core_cert/server_list.html:203
+msgid "A communication error occurred during verification."
+msgstr "검증 중 통신 오류가 발생했습니다."
+
+#: core_cert/templates/core_cert/server_ssh_setup.html:4
+msgid "SSH Key Setup"
+msgstr "SSH 키 설정"
+
+#: core_cert/templates/core_cert/server_ssh_setup.html:8
+msgid "SSH Public Key Registration"
+msgstr "SSH 공개키 등록"
+
+#: core_cert/templates/core_cert/server_ssh_setup.html:9
+msgid ""
+"To deploy certificates to the target server, you must register this system's "
+"public key."
+msgstr "대상 서버에 인증서를 배포하려면 이 시스템의 공개키를 등록해야 합니다."
+
+#: core_cert/templates/core_cert/server_ssh_setup.html:12
+msgid "Target Server"
+msgstr "대상 서버"
+
+#: core_cert/templates/core_cert/server_ssh_setup.html:13
+msgid "Address"
+msgstr "주소"
+
+#: core_cert/templates/core_cert/server_ssh_setup.html:14
+msgid "User"
+msgstr "사용자"
+
+#: core_cert/templates/core_cert/server_ssh_setup.html:20
+msgid "SSH Password"
+msgstr "SSH 비밀번호"
+
+#: core_cert/templates/core_cert/server_ssh_setup.html:21
+msgid "Enter SSH user password"
+msgstr "SSH 사용자 비밀번호를 입력하세요"
+
+#: core_cert/templates/core_cert/server_ssh_setup.html:23
+msgid ""
+"* Password is used only once for key registration and is not stored in the "
+"database."
+msgstr ""
+"* 비밀번호는 키 등록을 위해 일회성으로 사용되며 데이터베이스에 저장되지 않습"
+"니다."
+
+#: core_cert/templates/core_cert/server_ssh_setup.html:28
+#, python-format
+msgid ""
+"In case of SSH test failure, you may need to check the %%ProgramData%%\\ssh "
+"path."
+msgstr ""
+"SSH 테스트 실패 시 %%ProgramData%%\\ssh 경로를 확인해야할 수도 있습니다."
+
+#: core_cert/templates/core_cert/server_ssh_setup.html:34
+msgid "Register SSH Key"
+msgstr "SSH 키 등록"
+
+#: core_cert/templates/core_cert/server_ssh_setup.html:40
+msgid "Manual Registration Method"
+msgstr "수동 등록 방법"
+
+#: core_cert/templates/core_cert/server_ssh_setup.html:42
+msgid ""
+"If automatic registration via password fails, you can manually copy the "
+"public key and add it to the authorized_keys file on the target server."
+msgstr ""
+"비밀번호를 통한 자동 등록이 실패할 경우, 공개키를 수동으로 복사하여 대상 서버"
+"의 authorized_keys 파일에 추가할 수 있습니다."
+
+#: core_cert/templates/core_cert/server_ssh_setup.html:44
+msgid "Go to SSH Key Management to check public key"
+msgstr "SSH 키 관리로 이동하여 공개키 확인"
+
+#: core_cert/templates/core_cert/settings.html:9
+msgid "Back to Dashboard"
+msgstr "대시보드로 돌아가기"
+
+#: core_cert/templates/core_cert/settings.html:13
+msgid "Global Settings Management"
+msgstr "글로벌 설정 관리"
+
+#: core_cert/templates/core_cert/settings.html:17
+msgid "acme-dns Server Settings"
+msgstr "acme-dns 서버 설정"
+
+#: core_cert/templates/core_cert/settings.html:18
+msgid "acme-dns server info for wildcard certificate issuance."
+msgstr "와일드카드 인증서 발급을 위한 acme-dns 서버 정보."
+
+#: core_cert/templates/core_cert/settings.html:25
+msgid "e.g., http://acme-dns.your-domain.com:8080"
+msgstr "예: http://acme-dns.your-domain.com:8080"
+
+#: core_cert/templates/core_cert/settings.html:33
+msgid "CNAME Target Domain"
+msgstr "CNAME 대상 도메인"
+
+#: core_cert/templates/core_cert/settings.html:36
+msgid "e.g., auth.your-domain.com"
+msgstr "예: auth.your-domain.com"
+
+#: core_cert/templates/core_cert/settings.html:45
+msgid "ZeroSSL Settings"
+msgstr "ZeroSSL 설정"
+
+#: core_cert/templates/core_cert/settings.html:46
+msgid ""
+"Email address for ZeroSSL account registration. Required when using ZeroSSL "
+"as the CA server."
+msgstr ""
+"ZeroSSL 계정 등록용 이메일 주소입니다. CA 서버로 ZeroSSL을 사용할 때 필요합니"
+"다."
+
+#: core_cert/templates/core_cert/settings.html:50
+msgid "ZeroSSL Account Email"
+msgstr "ZeroSSL 계정 이메일"
+
+#: core_cert/templates/core_cert/settings.html:53
+msgid "e.g., admin@your-domain.com"
+msgstr "예: admin@your-domain.com"
+
+#: core_cert/templates/core_cert/settings.html:62
+msgid "Google Trust Services (GTS) Settings"
+msgstr "Google Trust Services (GTS) 설정"
+
+#: core_cert/templates/core_cert/settings.html:63
+msgid ""
+"EAB credentials for the free GTS ACME CA. Issue an EAB Key ID / HMAC Key "
+"from Google Cloud (Public Certificate Authority) and enter them below. "
+"Required when using GTS as the CA server. Wildcard certificates are "
+"supported via DNS-01."
+msgstr ""
+"무료 GTS ACME CA용 EAB 자격 증명입니다. Google Cloud(공개 인증 기관)에서 EAB "
+"Key ID / HMAC Key를 발급한 뒤 아래에 입력하세요. CA 서버로 GTS를 사용할 때 필"
+"요합니다. 와일드카드 인증서는 DNS-01 방식으로 지원됩니다."
+
+#: core_cert/templates/core_cert/settings.html:67
+msgid "EAB Key ID (kid)"
+msgstr "EAB Key ID (kid)"
+
+#: core_cert/templates/core_cert/settings.html:70
+msgid "e.g., a1b2c3d4..."
+msgstr "예: a1b2c3d4..."
+
+#: core_cert/templates/core_cert/settings.html:78
+msgid "EAB HMAC Key"
+msgstr "EAB HMAC Key"
+
+#: core_cert/templates/core_cert/settings.html:81
+msgid "Base64URL HMAC key from GCP"
+msgstr "GCP에서 발급한 Base64URL HMAC 키"
+
+#: core_cert/templates/core_cert/settings.html:90
+msgid "Auto Renewal Schedule"
+msgstr "자동 갱신 일정"
+
+#: core_cert/templates/core_cert/settings.html:91
+msgid ""
+"Automatically check for expiry and perform renewal/deployment at the set "
+"time every day."
+msgstr "매일 설정된 시간에 자동으로 만료를 확인하고 갱신/배포를 수행합니다."
+
+#: core_cert/templates/core_cert/settings.html:95
+msgid "Daily execution time (HH:MM)"
+msgstr "일일 실행 시간 (HH:MM)"
+
+#: core_cert/templates/core_cert/settings.html:99
+#: core_cert/templates/core_cert/settings.html:109
+msgid "Update Settings"
+msgstr "설정 업데이트"
+
+#: core_cert/templates/core_cert/settings.html:105
+msgid "Renewal Threshold (Days before expiry)"
+msgstr "갱신 기준일 (만료 n일 전)"
+
+#: core_cert/templates/core_cert/settings.html:114
+msgid "Next scheduled"
+msgstr "다음 예정"
+
+#: core_cert/templates/core_cert/settings.html:115
+msgid "Last run"
+msgstr "마지막 실행"
+
+#: core_cert/templates/core_cert/settings.html:117
+msgid "Check all certificates for renewal and perform deployment now?"
+msgstr "모든 인증서의 갱신을 확인하고 지금 배포를 수행하시겠습니까?"
+
+#: core_cert/templates/core_cert/settings.html:117
+msgid "Run Manually Now"
+msgstr "지금 수동 실행"
+
+#: core_cert/templates/core_cert/ssh_key_manage.html:4
+#: core_cert/templates/core_cert/ssh_key_manage.html:8
+msgid "SSH Key Management"
+msgstr "SSH 키 관리"
+
+#: core_cert/templates/core_cert/ssh_key_manage.html:13
+msgid "Current Public Keys"
+msgstr "현재 공개키"
+
+#: core_cert/templates/core_cert/ssh_key_manage.html:14
+msgid ""
+"These keys are registered on target servers to enable certificate "
+"deployment. (ED25519 is recommended for security and performance.)"
+msgstr ""
+"인증서 배포를 위해 대상 서버에 등록되는 키들입니다. (보안과 성능을 위해 "
+"ED25519를 권장합니다.)"
+
+#: core_cert/templates/core_cert/ssh_key_manage.html:19
+msgid "Public Key"
+msgstr "공개키"
+
+#: core_cert/templates/core_cert/ssh_key_manage.html:26
+msgid "No public keys registered. Please generate or register a key."
+msgstr "등록된 공개키가 없습니다. 키를 생성하거나 등록해 주세요."
+
+#: core_cert/templates/core_cert/ssh_key_manage.html:33
+msgid "Manual SSH Key Registration"
+msgstr "수동 SSH 키 등록"
+
+#: core_cert/templates/core_cert/ssh_key_manage.html:34
+msgid "You can register existing SSH keys by entering text or uploading files."
+msgstr ""
+"기존 SSH 키를 텍스트로 입력하거나 파일로 업로드하여 등록할 수 있습니다.기존 "
+"SSH 키를 텍스트로 입력하거나 파일로 업로드하여 등록할 수 있습니다.기존 SSH 키"
+"를 텍스트로 입력하거나 파일로 업로드하여 등록할 수 있습니다.기존 SSH 키를 텍"
+"스트로 입력하거나 파일로 업로드하여 등록할 수 있습니다.기존 SSH 키를 텍스트"
+"로 입력하거나 파일로 업로드하여 등록할 수 있습니다.기존 SSH 키를 텍스트로 입"
+"력하거나 파일로 업로드하여 등록할 수 있습니다.직접 텍스트를 입력하거나 파일"
+"을 업로드하여 기존 SSH 키를 등록할 수 있습니다."
+
+#: core_cert/templates/core_cert/ssh_key_manage.html:46
+msgid "Public Key (Optional)"
+msgstr "공개키 (선택 사항)"
+
+#: core_cert/templates/core_cert/ssh_key_manage.html:53
+msgid "Save Keys Manually"
+msgstr "키 수동 저장"
+
+#: core_cert/templates/core_cert/ssh_key_manage.html:54
+msgid ""
+"* If public key is not provided, it will attempt to generate it from the "
+"private key."
+msgstr "* 공개키가 제공되지 않으면 비밀키에서 생성을 시도합니다."
+
+#: core_cert/templates/core_cert/ssh_key_manage.html:61
+msgid "Danger Zone: Regenerate Keys"
+msgstr "위험 구역: 키 재생성"
+
+#: core_cert/templates/core_cert/ssh_key_manage.html:62
+msgid "Regenerating SSH keys may disconnect all currently registered servers."
+msgstr ""
+"SSH 키를 재생성하면 현재 등록된 모든 서버와의 연결이 끊길 수 있습니다.SSH 키"
+"를 재생성하면 현재 등록된 모든 서버와의 연결이 끊길 수 있습니다.SSH 키를 재생"
+"성하면 현재 등록된 모든 서버와의 연결이 끊길 수 있습니다.SSH 키를 재생성하면 "
+"현재 등록된 모든 서버와의 연결이 끊길 수 있습니다.SSH 키를 재생성하면 현재 등"
+"록된 모든 서버와의 연결이 끊길 수 있습니다.SSH 키를 재생성하면 현재 등록된 모"
+"든 서버와의 연결이 끊길 수 있습니다.SSH 키를 재생성하면 현재 등록된 모든 서버"
+"와의 연결이 끊어질 수 있습니다."
+
+#: core_cert/templates/core_cert/ssh_key_manage.html:63
+msgid "Are you sure you want to regenerate SSH keys?"
+msgstr "정말로 SSH 키를 재생성하시겠습니까?"
+
+#: core_cert/templates/core_cert/ssh_key_manage.html:65
+msgid "Generate New Key Set (Deletes Existing)"
+msgstr "새 키 세트 생성 (기존 항목 삭제)"
+
+#: core_cert/templates/core_cert/ssh_key_manage.html:73
+msgid "Public key copied to clipboard."
+msgstr "공개키가 클립보드에 복사되었습니다."
+
+#: core_cert/views.py:33
+#, python-brace-format
+msgid "Settings ({key}) saved."
+msgstr "설정 ({key})이 저장되었습니다."
+
+#: core_cert/views.py:825
+#, python-brace-format
+msgid "Missing files: {missing}"
+msgstr "누락된 파일: {missing}"
+
+#: core_cert/views.py:859
+msgid "Manual certificate finalized and PFX generated."
+msgstr "수동 인증서 처리가 완료되었고 PFX가 생성되었습니다."
+
+#: core_cert/views.py:860
+msgid "Manual certificate finalized (PFX generation skipped — check files)."
+msgstr ""
+"수동 인증서 처리가 완료되었습니다 (PFX 생성은 건너뜀 — 파일을 확인하세요).수"
+"동 인증서 처리가 완료되었습니다 (PFX 생성은 건너뜀 — 파일을 확인하세요).수동 "
+"인증서 처리가 완료되었습니다 (PFX 생성은 건너뜀 — 파일을 확인하세요).수동 인"
+"증서 처리가 완료되었습니다 (PFX 생성은 건너뜀 — 파일을 확인하세요).수동 인증"
+"서 처리가 완료되었습니다 (PFX 생성은 건너뜀 — 파일을 확인하세요).수동 인증서 "
+"처리가 완료되었습니다 (PFX 생성은 건너뜀 — 파일을 확인하세요)."
+
+#: core_cert/views.py:872
+#, python-brace-format
+msgid "{count} certificates synchronized."
+msgstr "{count}개의 인증서가 동기화되었습니다."
+
+#: core_cert/views.py:879
+msgid "Full renewal and deployment process started in the background."
+msgstr "전체 갱신 및 배포 프로세스가 백그라운드에서 시작되었습니다."
+
+#: core_cert/views.py:892
+#, python-brace-format
+msgid "{domain} deployment hook setup completed."
+msgstr "{domain} 배포 훅 설정이 완료되었습니다."
+
+#: core_cert/views.py:893
+#, python-brace-format
+msgid "Failed: {error}"
+msgstr "실패: {error}"
+
+#: core_cert/views.py:894
+#, python-brace-format
+msgid "Error: {error}"
+msgstr "오류: {error}"
+
+#: core_cert/views.py:909
+#, python-brace-format
+msgid "{hh}h {mm}m left"
+msgstr "{hh}시간 {mm}분 남음"
+
+#: core_cert/views.py:910
+msgid "Calculation failed"
+msgstr "계산 실패"
+
+#: core_cert/views.py:934
+msgid "ZIP extracted. Please assign the certificate files below."
+msgstr "ZIP 압축을 해제했습니다. 아래에서 인증서 파일을 지정하세요."
+
+#: core_cert/views.py:936 core_cert/views.py:977
+#, python-brace-format
+msgid "ZIP extraction failed: {error}"
+msgstr "ZIP 압축 해제 실패: {error}"
+
+#: core_cert/views.py:975
+msgid "New ZIP extracted."
+msgstr "새 ZIP 압축을 해제했습니다."
+
+#: core_cert/views.py:1024
+#, python-brace-format
+msgid "Server '{name}' deleted."
+msgstr "서버 '{name}'이(가) 삭제되었습니다."
+
+#: core_cert/views.py:1025
+msgid "Delete Server"
+msgstr "서버 삭제"
+
+#: core_cert/views.py:1034
+#, python-brace-format
+msgid "SSH connection successful: {name}"
+msgstr "SSH 연결 성공: {name}"
+
+#: core_cert/views.py:1035
+#, python-brace-format
+msgid "SSH connection failed: {error}"
+msgstr "SSH 연결 실패: {error}"
+
+#: core_cert/views.py:1078
+msgid "SSH key registered successfully"
+msgstr "SSH 키가 성공적으로 등록되었습니다"
+
+#: core_cert/views.py:1079
+#, python-brace-format
+msgid "Registration failed: {error}"
+msgstr "등록 실패: {error}"
+
+#: core_cert/views.py:1086
+msgid "Regeneration completed"
+msgstr "재생성 완료"
+
+#: core_cert/views.py:1089
+msgid "Saved successfully"
+msgstr "성공적으로 저장되었습니다"
+
+#: core_cert/views.py:1111
+msgid "Marked as resolved."
+msgstr "해결됨으로 표시되었습니다."
+
+#: core_cert/views.py:1114
+msgid "Deleted successfully"
+msgstr "성공적으로 삭제되었습니다"
+
+#: core_cert/views.py:1123
+#, python-brace-format
+msgid "{count} items marked as resolved."
+msgstr "{count}개 항목이 해결됨으로 표시되었습니다."
+
+#: core_cert/views.py:1124
+#, python-brace-format
+msgid "{count} items deleted."
+msgstr "{count}개 항목이 삭제되었습니다."
+
+#: core_cert/views.py:1420
+#, python-brace-format
+msgid "Certificate files for {domain} have been deleted."
+msgstr "{domain}의 인증서 파일이 성공적으로 삭제되었습니다."
+
+#: core_cert/views.py:1422
+#, python-brace-format
+msgid "Error deleting files: {error}"
+msgstr "파일 삭제 중 오류 발생: {error}"
+
+#: core_cert/views.py:1425
+#, python-brace-format
+msgid "Certificate {domain} removed from database."
+msgstr "인증서 {domain}이(가) 데이터베이스에서 삭제되었습니다."
+
+#: core_cert/views.py:1430
+msgid "Delete Certificate"
+msgstr "인증서 삭제"
+
+#: core_cert/views.py:1486
+msgid "Invalid request method."
+msgstr "잘못된 요청 방식입니다."
+
+#: core_cert/views.py:1488
+msgid "Only manual certificates can be restored."
+msgstr "수동 인증서만 복구할 수 있습니다."
+
+#: core_cert/views.py:1492
+msgid "There is no previous certificate to restore."
+msgstr "복구할 이전 인증서가 없습니다."
+
+#: core_cert/views.py:1493
+#, python-brace-format
+msgid "Restore failed: {error}"
+msgstr "복구 실패: {error}"
+
+#: core_cert/views.py:1499
+msgid "Restored to the previous certificate."
+msgstr "이전 인증서로 복구되었습니다."
+
+#: templates/base.html:45
+msgid "Toggle Theme"
+msgstr "테마 변경"
+
+#: templates/base.html:51
+msgid "User Profile"
+msgstr "사용자 프로필"
+
+#: templates/base.html:63
+msgid "Certificates"
+msgstr "인증서 관리"
+
+#: templates/base.html:65
+msgid "Scripts"
+msgstr "배포 스크립트"
+
+#: templates/base.html:66
+msgid "SSH Keys"
+msgstr "SSH 키 관리"
+
+#: templates/base.html:67
+msgid "Settings"
+msgstr "설정"
+
+#: templates/base.html:69 templates/registration/login.html:4
+#: templates/registration/login.html:11 templates/registration/login.html:22
+msgid "Login"
+msgstr "로그인"
+
+#: templates/base.html:90
+msgid "Confirm"
+msgstr "확인"
+
+#: templates/base.html:115
+msgid "Profile"
+msgstr "프로필"
+
+#: templates/base.html:128
+msgid "Language"
+msgstr "언어"
+
+#: templates/base.html:146
+msgid "Admin Page"
+msgstr "관리자 페이지"
+
+#: templates/base.html:151
+msgid "Logout"
+msgstr "로그아웃"
+
+#: templates/registration/login.html:15
+msgid "Username"
+msgstr "사용자 이름"
+
+#: templates/registration/login.html:19
+msgid "Password"
+msgstr "비밀번호"
+
+#: templates/registration/login.html:26
+msgid "Invalid username or password."
+msgstr "잘못된 사용자 이름 또는 비밀번호입니다."
+
+#~ msgid "Path"
+#~ msgstr "경로"
+
+#~ msgid "DNS Challenge"
+#~ msgstr "DNS 챌린지"
+
+#~ msgid "Production"
+#~ msgstr "운영"
+
+#~ msgid "Allowed Domains"
+#~ msgstr "허용된 도메인"
+
+#~ msgid "Renewal Expected Date"
+#~ msgstr "갱신 예정일"
+
+#~ msgid "Test Issue"
+#~ msgstr "테스트 발급"
+
+#~ msgid "Daily run time"
+#~ msgstr "일일 실행 시간"
+
+#~ msgid "Change"
+#~ msgstr "변경"

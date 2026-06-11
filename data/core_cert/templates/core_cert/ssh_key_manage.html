@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "SSH Key Management" %} - AgnCERT{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+    <h2 style="margin: 0;">{% trans "SSH Key Management" %}</h2>
+</div>
+
+<!-- 현재 공개키 확인 -->
+<div class="card">
+    <h3 style="margin-top: 0; color: var(--bs-heading-color);">{% trans "Current Public Keys" %}</h3>
+    <p style="color: var(--bs-secondary-color); font-size: 0.9rem; margin-bottom: 15px;">{% trans "These keys are registered on target servers to enable certificate deployment. (ED25519 is recommended for security and performance.)" %}</p>
+    
+    <div style="display: grid; gap: 15px;">
+        {% for type, key in public_keys.items %}
+        <div>
+            <label style="display: block; font-weight: 600; margin-bottom: 5px; font-size: 0.85rem; color: var(--bs-heading-color);">{{ type|upper }} {% trans "Public Key" %}</label>
+            <div style="background: rgba(0,0,0,0.2); padding: 12px; border-radius: 4px; border: 1px solid var(--bs-border-color); position: relative;">
+                <pre id="publicKeyDisp_{{ type }}" style="margin: 0; white-space: pre-wrap; word-break: break-all; font-size: 0.8rem; padding-right: 50px; color: var(--bs-body-color);">{{ key }}</pre>
+                <button onclick="copyToClipboard('publicKeyDisp_{{ type }}')" class="btn btn-sm" style="position: absolute; top: 10px; right: 10px; padding: 4px 8px; font-size: 0.7rem; background: var(--bs-tertiary-bg); border: 1px solid var(--bs-border-color); color: var(--bs-body-color);">{% trans "Copy" %}</button>
+            </div>
+        </div>
+        {% empty %}
+        <p style="color: #ef4444; font-weight: 600;">{% trans "No public keys registered. Please generate or register a key." %}</p>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- 수동 등록 및 파일 업로드 -->
+<div class="card">
+    <h3 style="margin-top: 0; color: var(--bs-heading-color);">{% trans "Manual SSH Key Registration" %}</h3>
+    <p style="color: var(--bs-secondary-color); font-size: 0.9rem; margin-bottom: 15px;">{% trans "You can register existing SSH keys by entering text or uploading files." %}</p>
+    
+    <form method="post" enctype="multipart/form-data" style="display: grid; gap: 20px;">
+        {% csrf_token %}
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div>
+                <label style="display: block; font-weight: 600; margin-bottom: 8px; color: var(--bs-heading-color);">{% trans "Private Key" %}</label>
+                <textarea name="private_key" class="form-control" placeholder="-----BEGIN OPENSSH PRIVATE KEY----- ..." style="width: 100%; height: 150px; font-family: monospace; padding: 10px;"></textarea>
+                <input type="file" name="private_key_file" class="form-control form-control-sm" style="margin-top: 8px; font-size: 0.8rem;">
+            </div>
+            <div>
+                <label style="display: block; font-weight: 600; margin-bottom: 8px; color: var(--bs-heading-color);">{% trans "Public Key (Optional)" %}</label>
+                <textarea name="public_key" class="form-control" placeholder="ssh-rsa AAAAB3Nza..." style="width: 100%; height: 150px; font-family: monospace; padding: 10px;"></textarea>
+                <input type="file" name="public_key_file" class="form-control form-control-sm" style="margin-top: 8px; font-size: 0.8rem;">
+            </div>
+        </div>
+        
+        <div>
+            <button type="submit" name="save_manual" class="btn btn-primary">{% trans "Save Keys Manually" %}</button>
+            <p style="font-size: 0.8rem; color: var(--bs-secondary-color); margin-top: 8px;">{% trans "* If public key is not provided, it will attempt to generate it from the private key." %}</p>
+        </div>
+    </form>
+</div>
+
+<!-- 재생성 섹션 -->
+<div class="card" style="border-top: 4px solid #ef4444;">
+    <h3 style="margin-top: 0; color: #ef4444;">{% trans "Danger Zone: Regenerate Keys" %}</h3>
+    <p style="font-size: 0.9rem; color: var(--bs-secondary-color);">{% trans "Regenerating SSH keys may disconnect all currently registered servers." %}</p>
+    <form method="post" onsubmit="return confirm('{% trans "Are you sure you want to regenerate SSH keys?" %}');">
+        {% csrf_token %}
+        <button type="submit" name="regenerate" class="btn" style="background-color: #ef4444; color: white;">{% trans "Generate New Key Set (Deletes Existing)" %}</button>
+    </form>
+</div>
+
+<script>
+function copyToClipboard(id) {
+    const text = document.getElementById(id).innerText;
+    navigator.clipboard.writeText(text).then(() => {
+        alert('{% trans "Public key copied to clipboard." %}');
+    });
+}
+</script>
+{% endblock %}

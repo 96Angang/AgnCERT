@@ -1,0 +1,417 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% if object %}{% trans "Edit Certificate" %}{% else %}{% trans "Add Certificate" %}{% endif %} - AgnCERT{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+    <h2 style="margin: 0;">
+        {% if object %}
+            {% trans "Edit Certificate" %}: {{ object.domain }}
+        {% else %}
+            {% trans "Register New Certificate" %}
+        {% endif %}
+    </h2>
+    <a href="{% url 'core_cert:certificate_list' %}" class="btn btn-outline-secondary">{% trans "Back to List" %}</a>
+</div>
+
+<div class="card">
+    <form method="post" enctype="multipart/form-data" style="display: grid; gap: 20px;">
+        {% csrf_token %}
+
+        <div class="field-wrapper">
+            <label class="field-label">{% trans "Issuance Method" %}</label>
+            <div id="cert-type-group" style="display: flex; gap: 24px; padding: 6px 0;">
+                {% for radio in form.cert_type %}
+                <label class="check-item" style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    {{ radio.tag }}
+                    <span style="font-weight: 600;">{{ radio.choice_label }}</span>
+                </label>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="field-wrapper">
+            <label class="field-label">{% trans "Title" %} <span style="font-weight: normal; color: var(--bs-secondary-color); font-size: 0.85rem;">{% trans "(Optional — distinguishes certs with the same domain)" %}</span></label>
+            {{ form.name }}
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="field-wrapper">
+                <label class="field-label">{% trans "Domain (FQDN)" %}</label>
+                {{ form.domain }}
+            </div>
+            <div class="field-wrapper">
+                <label class="field-label">{% trans "acme.sh Path" %}</label>
+                {{ form.cert_path }}
+            </div>
+        </div>
+
+        {# --- 자동(acme.sh) 전용 필드 --- #}
+        <div class="auto-only" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
+            <div class="field-wrapper">
+                <label class="field-label">{% trans "CA Server" %}</label>
+                {{ form.ca_server }}
+            </div>
+            <div class="field-wrapper">
+                <label class="field-label">{% trans "Key Type" %}</label>
+                {{ form.key_type }}
+            </div>
+            <div class="field-wrapper">
+                <label class="field-label">{% trans "DNS Provider" %}</label>
+                {{ form.dns_provider }}
+            </div>
+        </div>
+
+        {# --- 수동(업로드) 전용 필드 --- #}
+        <div class="manual-only">
+            <div class="field-wrapper">
+                <label class="field-label">{% trans "Certificate ZIP file" %}</label>
+                {{ form.upload_zip }}
+                <small style="color: var(--bs-secondary-color);">{% trans "Upload a ZIP containing the certificate, key and fullchain files. It will be extracted into" %} <code>/app/acme.sh/manual/&lt;domain&gt;</code>.</small>
+                {% if form.upload_zip.errors %}<div style="color: var(--bs-danger); font-size: 0.85rem;">{{ form.upload_zip.errors }}</div>{% endif %}
+                {% if object and object.cert_type == 'manual' %}
+                <small style="display:block; color: var(--bs-secondary-color); margin-top: 6px;">{% trans "When you upload a new ZIP, the current files are backed up to the" %} <code>_old</code> {% trans "folder (only the most recent backup is kept)." %}</small>
+                {% endif %}
+            </div>
+
+            {# --- 직전 인증서 백업/복구 --- #}
+            {% if object and object.cert_type == 'manual' %}
+            <div class="field-wrapper" style="margin-top: 10px; padding: 12px 14px; border: 1px solid var(--bs-border-color); border-radius: 8px; background: rgba(0,0,0,0.03);">
+                <label class="field-label" style="margin-bottom: 6px;">{% trans "Previous certificate (backup)" %}</label>
+                {% if old_backup.exists %}
+                    <div style="font-size: 0.88rem; color: var(--bs-body-color);">
+                        <i class="fas fa-clock"></i>
+                        {% trans "Backed up at" %}: <strong>{{ old_backup.date|default:_("unknown") }}</strong>
+                        <span style="color: var(--bs-secondary-color);">({{ old_backup.files|length }} {% trans "files" %})</span>
+                    </div>
+                    <button type="button" id="restore-prev-btn" data-url="{% url 'core_cert:restore_manual_cert' object.pk %}"
+                            class="btn" style="margin-top: 10px; background-color: #f59e0b; color: white;"
+                            onclick="return confirm('{% trans "Restore to the previous certificate? The current files will be swapped with the backup." %}');">
+                        <i class="fas fa-undo"></i> {% trans "Restore previous certificate" %}
+                    </button>
+                    <div id="restore-prev-result" style="margin-top: 10px;"></div>
+                {% else %}
+                    <div style="font-size: 0.88rem; color: var(--bs-secondary-color);"><i class="fas fa-info-circle"></i> {% trans "Does not exist." %}</div>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            {% if object and object.cert_type == 'manual' %}
+            <div class="card" style="margin-top: 16px; background: rgba(99,102,241,0.06); border: 1px solid rgba(99,102,241,0.25);">
+                <h4 style="margin-top: 0;">{% trans "Assign Certificate Files" %}</h4>
+                {% if manual_files %}
+                <p style="color: var(--bs-secondary-color); font-size: 0.88rem;">{% trans "The following files were found. Confirm or change the mapping, then save to generate the PFX." %}</p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 16px; margin-top: 10px;">
+                    <div class="field-wrapper">
+                        <label class="field-label">{% trans "Private Key" %}</label>
+                        <select name="manual_key" class="form-input">
+                            <option value="">{% trans "-- select --" %}</option>
+                            {% for f in manual_files %}
+                            <option value="{{ f.name }}" {% if f.name == manual_guess.key %}selected{% endif %}>{{ f.name }}{% if f.kind == 'key' %} ✓{% endif %} [{{ f.kind }}]</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="field-wrapper">
+                        <label class="field-label">{% trans "Certificate (leaf)" %}</label>
+                        <select name="manual_cert" class="form-input">
+                            <option value="">{% trans "-- auto (from fullchain) --" %}</option>
+                            {% for f in manual_files %}
+                            <option value="{{ f.name }}" {% if f.name == manual_guess.cert %}selected{% endif %}>{{ f.name }}{% if f.kind == 'leaf' %} ✓{% endif %} [{{ f.kind }}]</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="field-wrapper">
+                        <label class="field-label">{% trans "Fullchain" %}</label>
+                        <select name="manual_fullchain" class="form-input">
+                            <option value="">{% trans "-- auto-generate (leaf + CA) --" %}</option>
+                            {% for f in manual_files %}
+                            <option value="{{ f.name }}" {% if f.name == manual_guess.fullchain %}selected{% endif %}>{{ f.name }}{% if f.kind == 'fullchain' %} ✓{% endif %} [{{ f.kind }}]</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="field-wrapper">
+                        <label class="field-label">{% trans "Intermediate chain" %}</label>
+                        <select name="manual_chain" class="form-input">
+                            <option value="">{% trans "-- auto (intermediate only) --" %}</option>
+                            {% for f in manual_files %}
+                            <option value="{{ f.name }}" {% if f.name == manual_guess.chain %}selected{% endif %}>{{ f.name }}{% if f.kind == 'ca' %} ✓{% endif %} [{{ f.kind }}]</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <p style="margin-top: 8px; color: var(--bs-secondary-color); font-size: 0.8rem;">
+                    {% trans "Legend" %}: <code>leaf</code> = {% trans "domain certificate" %}, <code>fullchain</code> = {% trans "leaf + chain" %}, <code>ca</code> = {% trans "Root/CA bundle" %}, <code>key</code> = {% trans "private key" %}.
+                    {% trans "If you don't pick a fullchain, one will be built from the leaf and CA files." %}
+                    {% trans "The intermediate chain (for Apache SSLCertificateChainFile) excludes the leaf and root; if not picked it is auto-extracted." %}
+                </p>
+                {% if manual_current.chain %}
+                <p style="margin-top: 8px; color: var(--bs-info);">✓ {% trans "Intermediate chain present" %}: <code>{{ manual_current.chain }}</code></p>
+                {% endif %}
+                {% if manual_current.pfx %}
+                <p style="margin-top: 12px; color: var(--bs-success);">✓ {% trans "PFX present" %}: <code>{{ manual_current.pfx }}</code> ({% trans "password" %}: <code>password</code>)</p>
+                {% endif %}
+
+                <div style="margin-top: 16px; padding-top: 14px; border-top: 1px dashed rgba(99,102,241,0.3);">
+                    <button type="button" id="regen-files-btn" data-url="{% url 'core_cert:regenerate_cert_files' object.pk %}" class="btn" style="background-color: #475569; color: white;">{% trans "Regenerate files (chain / RootCA / PFX)" %}</button>
+                    <small style="display: block; margin-top: 8px; color: var(--bs-secondary-color);">{% trans "Rebuilds chain / RootCA / PFX from the certificate files above. PFX password is fixed to" %} <code>password</code>.</small>
+                    <div id="regen-files-result" style="margin-top: 12px;"></div>
+                </div>
+                {% else %}
+                <p style="color: var(--bs-warning);">{% trans "No files found in the certificate folder yet. Upload a ZIP above." %}</p>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="field-wrapper auto-only">
+            <label class="check-item" style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                {{ form.is_wildcard }}
+                <span style="font-weight: 600;">{% trans "Wildcard Certificate" %} (*.domain.com)</span>
+            </label>
+        </div>
+
+        <hr style="opacity: 0.1; margin: 10px 0;">
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="field-wrapper">
+                <label class="field-label"><i class="fas fa-calendar-alt" style="opacity:0.6;"></i> {% trans "Expiry Date" %}</label>
+                {{ form.expiry_date }}
+            </div>
+            <div class="field-wrapper">
+                <label class="field-label"><i class="fas fa-circle-check" style="opacity:0.6;"></i> {% trans "Status" %}</label>
+                {% if object and object.status %}
+                <div style="padding: 8px 0;">
+                    {% if object.status == 'valid' %}
+                        <span style="display:inline-flex; align-items:center; gap:6px; background: rgba(16,185,129,0.12); color:#10b981; border:1px solid rgba(16,185,129,0.35); padding:6px 14px; border-radius:20px; font-weight:600; font-size:0.9rem;"><i class="fas fa-shield-alt"></i> {% trans "Valid" %}</span>
+                    {% elif object.status == 'expired' %}
+                        <span style="display:inline-flex; align-items:center; gap:6px; background: rgba(239,68,68,0.12); color:#ef4444; border:1px solid rgba(239,68,68,0.35); padding:6px 14px; border-radius:20px; font-weight:600; font-size:0.9rem;"><i class="fas fa-triangle-exclamation"></i> {% trans "Expired" %}</span>
+                    {% else %}
+                        <span style="display:inline-flex; align-items:center; gap:6px; background: rgba(148,163,184,0.15); color: var(--bs-secondary-color); border:1px solid var(--bs-border-color); padding:6px 14px; border-radius:20px; font-weight:600; font-size:0.9rem;"><i class="fas fa-question-circle"></i> {{ object.status }}</span>
+                    {% endif %}
+                    {{ form.status.as_hidden }}
+                </div>
+                {% else %}
+                {{ form.status }}
+                {% endif %}
+            </div>
+        </div>
+
+        <div style="margin-top: 10px; display: flex; gap: 12px;">
+            <button type="submit" class="btn btn-primary" style="padding: 10px 30px;">{% trans "Save" %}</button>
+            {% if object and object.cert_type != 'manual' %}
+            <a href="{% url 'core_cert:setup_renewal_hook' object.pk %}" class="btn auto-only" style="background-color: #6366f1;">{% trans "Setup acme.sh Hook" %}</a>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+{% if object %}
+<div class="card" style="margin-top: 30px;">
+    <h3 style="margin-top: 0; color: var(--bs-heading-color);">{% trans "Connected Deployment Scripts" %} ({{ scripts|length }})</h3>
+    {% if scripts %}
+    <table style="margin-top: 15px;">
+        <thead>
+            <tr>
+                <th>{% trans "Script Name" %}</th>
+                <th>{% trans "Target Servers" %}</th>
+                <th style="text-align: right;">{% trans "Actions" %}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for script in scripts %}
+            <tr>
+                <td><strong>{{ script.name }}</strong></td>
+                <td>
+                    {% for target in script.deployment_targets.all %}
+                        <span style="display: inline-block; background: rgba(99,102,241,0.12); border: 1px solid rgba(99,102,241,0.3); padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; margin: 2px 2px 2px 0;">
+                            <i class="fas fa-server" style="opacity: 0.6;"></i> {{ target.server.name }}
+                        </span>
+                    {% empty %}
+                        <span style="color: var(--bs-secondary-color); font-size: 0.85rem;">{% trans "No target servers" %}</span>
+                    {% endfor %}
+                </td>
+                <td style="text-align: right; white-space: nowrap;">
+                    <a href="{% url 'core_cert:script_detail' script.pk %}" class="btn" style="background-color: #3b82f6; color: white; padding: 5px 18px; font-size: 0.82rem; text-decoration: none; text-align: center;">{% trans "Run" %}</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p style="text-align: center; padding: 20px; color: var(--bs-secondary-color);">{% trans "No connected scripts." %}</p>
+    {% endif %}
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    (function() {
+        function getCertType() {
+            let val = 'auto';
+            document.querySelectorAll('input[name="cert_type"]').forEach(r => { if (r.checked) val = r.value; });
+            return val;
+        }
+
+        function getDefaultPath(domain, caServer, keyType, certType) {
+            if (!domain) return '';
+            if (certType === 'manual') return `/app/acme.sh/manual/${domain}`;
+            const isEcc = (keyType === 'ec-256' || !keyType);
+            const suffix = isEcc ? `${domain}_ecc` : domain;
+            if (caServer === 'zerossl') return `/app/acme.sh/ZeroSSL/${suffix}`;
+            if (caServer === 'google') return `/app/acme.sh/Google/${suffix}`;
+            return `/app/acme.sh/${suffix}`;
+        }
+
+        function isAutoPath(val) {
+            // 시스템이 생성한 자동/수동 기본 경로인지 (사용자가 손대지 않았는지) 판별
+            const v = val.trim();
+            if (/^\/app\/acme\.sh\/manual\/[^/]+$/.test(v)) return true;
+            return /^\/app\/acme\.sh\/(ZeroSSL\/|Google\/)?[^/]+((_ecc)?)$/.test(v);
+        }
+
+        let pathInited = false;
+        function updatePath() {
+            if (pathInited) return;
+            const domainInput = document.querySelector('input[name="domain"]');
+            const pathInput = document.querySelector('input[name="cert_path"]');
+            const caSelect = document.querySelector('select[name="ca_server"]');
+            const keyTypeSelect = document.querySelector('select[name="key_type"]');
+            if (!domainInput || !pathInput) return;
+            pathInited = true;
+
+            let userEditedPath = pathInput.value && !isAutoPath(pathInput.value);
+
+            pathInput.addEventListener('input', function() {
+                userEditedPath = !isAutoPath(this.value);
+            });
+
+            function refreshPath() {
+                if (userEditedPath) return;
+                const domain = domainInput.value.trim().replace('*.', '');
+                const keyType = keyTypeSelect ? keyTypeSelect.value : 'ec-256';
+                const caServer = caSelect ? caSelect.value : 'letsencrypt';
+                pathInput.value = getDefaultPath(domain, caServer, keyType, getCertType());
+            }
+
+            domainInput.addEventListener('input', refreshPath);
+            if (caSelect) caSelect.addEventListener('change', refreshPath);
+            if (keyTypeSelect) keyTypeSelect.addEventListener('change', refreshPath);
+            document.querySelectorAll('input[name="cert_type"]').forEach(r => r.addEventListener('change', refreshPath));
+        }
+
+        let toggleInited = false;
+        function toggleCertType() {
+            const radios = document.querySelectorAll('input[name="cert_type"]');
+            if (!radios.length) return;
+            function apply() {
+                let val = 'auto';
+                radios.forEach(r => { if (r.checked) val = r.value; });
+                const isManual = (val === 'manual');
+                document.querySelectorAll('.auto-only').forEach(el => {
+                    if (el.dataset.origDisplay === undefined) el.dataset.origDisplay = el.style.display || '';
+                    el.style.display = isManual ? 'none' : el.dataset.origDisplay;
+                });
+                document.querySelectorAll('.manual-only').forEach(el => {
+                    if (el.dataset.origDisplay === undefined) el.dataset.origDisplay = el.style.display || '';
+                    el.style.display = isManual ? el.dataset.origDisplay : 'none';
+                });
+            }
+            if (!toggleInited) {
+                radios.forEach(r => r.addEventListener('change', apply));
+                toggleInited = true;
+            }
+            apply();
+        }
+
+        function getCsrfToken() {
+            const el = document.querySelector('[name=csrfmiddlewaretoken]');
+            if (el && el.value) return el.value;
+            const m = document.cookie.match(/(?:^|;\s*)(?:Agncert_csrftoken|csrftoken)=([^;]+)/);
+            return m ? decodeURIComponent(m[1]) : '';
+        }
+
+        let regenInited = false;
+        function initRegenButton() {
+            const btn = document.getElementById('regen-files-btn');
+            if (!btn || regenInited) return;
+            regenInited = true;
+            const resultBox = document.getElementById('regen-files-result');
+            const MSG_REGENERATING = "{% trans 'Regenerating...' %}";
+            const MSG_RESULT = "{% trans 'Regeneration result' %}";
+            const MSG_FAIL = "{% trans 'File regeneration failed. Make sure the certificate files are assigned and saved first.' %}";
+            btn.addEventListener('click', function() {
+                btn.disabled = true;
+                const orig = btn.textContent;
+                btn.textContent = MSG_REGENERATING;
+                fetch(btn.dataset.url, {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': getCsrfToken() },
+                    credentials: 'same-origin'
+                })
+                    .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+                    .then(data => {
+                        if (data.error) { alert(data.error); return; }
+                        const rows = (data.results || []).map(r =>
+                            `<div style="display:flex; gap:8px; align-items:center; margin:3px 0;">
+                                <span style="color:${r.ok ? '#22c55e' : '#ef4444'};">${r.ok ? '✓' : '✗'}</span>
+                                <span style="opacity:0.8; min-width:160px;">${r.label}</span>
+                                <code style="background:rgba(0,0,0,0.25); padding:2px 8px; border-radius:4px;">${r.file}</code>
+                            </div>`).join('');
+                        resultBox.innerHTML =
+                            `<div style="padding: 12px; border-radius: 8px; border: 1px solid rgba(59,130,246,0.4); background: rgba(59,130,246,0.08);">
+                                <div style="font-weight: 600; margin-bottom: 8px;">${MSG_RESULT}</div>${rows}
+                            </div>`;
+                    })
+                    .catch(err => { console.error(err); alert(MSG_FAIL); })
+                    .finally(() => { btn.disabled = false; btn.textContent = orig; });
+            });
+        }
+
+        let restoreInited = false;
+        function initRestoreButton() {
+            const btn = document.getElementById('restore-prev-btn');
+            if (!btn || restoreInited) return;
+            restoreInited = true;
+            const resultBox = document.getElementById('restore-prev-result');
+            const MSG_RESTORING = "{% trans 'Restoring...' %}";
+            const MSG_FAIL = "{% trans 'Restore failed.' %}";
+            btn.addEventListener('click', function() {
+                btn.disabled = true;
+                const orig = btn.innerHTML;
+                btn.textContent = MSG_RESTORING;
+                fetch(btn.dataset.url, {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': getCsrfToken() },
+                    credentials: 'same-origin'
+                })
+                    .then(r => r.json().then(d => ({ ok: r.ok, d })))
+                    .then(({ ok, d }) => {
+                        if (!ok || d.error) {
+                            resultBox.innerHTML = `<div style="color:#ef4444;">✗ ${d.error || MSG_FAIL}</div>`;
+                            btn.disabled = false; btn.innerHTML = orig;
+                            return;
+                        }
+                        resultBox.innerHTML = `<div style="color:#22c55e;">✓ ${d.message}</div>`;
+                        // 복구 후 파일 목록/표시가 바뀌므로 새로고침
+                        setTimeout(() => window.location.reload(), 800);
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        resultBox.innerHTML = `<div style="color:#ef4444;">✗ ${MSG_FAIL}</div>`;
+                        btn.disabled = false; btn.innerHTML = orig;
+                    });
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() { updatePath(); toggleCertType(); initRegenButton(); initRestoreButton(); });
+        document.addEventListener('htmx:afterSettle', function() { updatePath(); toggleCertType(); initRegenButton(); initRestoreButton(); });
+        updatePath();
+        toggleCertType();
+        initRegenButton();
+        initRestoreButton();
+    })();
+</script>
+{% endblock %}

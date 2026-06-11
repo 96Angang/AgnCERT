@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "SSH Key Setup" %} - AgnCert{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 700px; margin: 0 auto;">
+    <h3 style="margin-top: 0; color: var(--bs-heading-color);">{% trans "SSH Public Key Registration" %}</h3>
+    <p style="color: var(--bs-secondary-color);">{% trans "To deploy certificates to the target server, you must register this system's public key." %}</p>
+    
+    <div style="background: rgba(0,0,0,0.2); padding: 20px; border-radius: 8px; border: 1px solid var(--bs-border-color); margin: 20px 0;">
+        <h5 style="font-size: 1rem; color: var(--bs-heading-color);">{% trans "Target Server" %}: <strong>{{ server.name }}</strong></h5>
+        <p style="font-size: 0.9rem; margin-bottom: 0; color: var(--bs-body-color);">{% trans "Address" %}: {{ server.ip_address }}:{{ server.ssh_port }}</p>
+        <p style="font-size: 0.9rem; color: var(--bs-body-color);">{% trans "User" %}: {{ server.ssh_user }}</p>
+    </div>
+
+    <form method="post" style="display: grid; gap: 20px;">
+        {% csrf_token %}
+        <div>
+            <label style="display: block; font-weight: 600; margin-bottom: 8px; color: var(--bs-heading-color);">{% trans "SSH Password" %}</label>
+            <input type="password" name="password" class="form-control" placeholder="{% trans "Enter SSH user password" %}" required>
+            <p style="font-size: 0.8rem; color: var(--bs-secondary-color); margin-top: 8px; margin-bottom: 0;">
+                {% trans "* Password is used only once for key registration and is not stored in the database." %}
+            </p>
+            {% if server.os_type == 'windows' %}
+            <p style="font-size: 0.8rem; color: #f59e0b; margin-top: 8px; margin-bottom: 0;">
+                <i class="bi bi-info-circle me-1"></i>
+                {% trans "In case of SSH test failure, you may need to check the %ProgramData%\ssh path." %}
+            </p>
+            {% endif %}
+        </div>
+        
+        <div style="display: flex; gap: 12px; align-items: center;">
+            <button type="submit" class="btn btn-primary">{% trans "Register SSH Key" %}</button>
+            <a href="{% url 'core_cert:server_list' %}" class="btn btn-outline-secondary">{% trans "Cancel" %}</a>
+        </div>
+    </form>
+
+    <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--bs-border-color);">
+        <h5 style="font-size: 1rem; color: var(--bs-heading-color);">{% trans "Manual Registration Method" %}</h5>
+        <p style="font-size: 0.85rem; color: var(--bs-secondary-color);">
+            {% trans "If automatic registration via password fails, you can manually copy the public key and add it to the authorized_keys file on the target server." %}
+        </p>
+        <a href="{% url 'core_cert:ssh_key_manage' %}" style="font-size: 0.85rem; color: #3b82f6;">{% trans "Go to SSH Key Management to check public key" %} →</a>
+    </div>
+</div>
+{% endblock %}

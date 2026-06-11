@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Deployment Scripts" %} - AgnCERT{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+    <h2 style="margin: 0;">{% trans "Deployment Scripts" %}</h2>
+    <div style="display: flex; gap: 8px;">
+        <a href="{% url 'core_cert:certificate_list' %}" class="btn" style="background-color: #64748b; color: white;">{% trans "Back" %}</a>
+        <a href="{% url 'core_cert:script_add' %}" class="btn btn-primary">{% trans "Add Script" %}</a>
+    </div>
+</div>
+
+<div class="card" style="padding: 0; overflow: hidden;">
+    <table style="margin: 0; width: 100%; table-layout: fixed;">
+        <colgroup>
+            <col style="width: auto;">
+            <col style="width: 160px;">
+            <col style="width: 80px;">
+            <col style="width: 120px;">
+            <col style="width: 148px;">
+        </colgroup>
+        <thead>
+            <tr style="border-bottom: 1px solid var(--bs-border-color);">
+                <th style="padding: 15px; color: var(--bs-heading-color);">{% trans "Script Name" %}</th>
+                <th style="color: var(--bs-heading-color);">{% trans "Connected Domain" %}</th>
+                <th style="color: var(--bs-heading-color);">{% trans "Targets" %}</th>
+                <th style="color: var(--bs-heading-color);">{% trans "Last Executed" %}</th>
+                <th style="text-align: right; padding-right: 16px; color: var(--bs-heading-color);">{% trans "Actions" %}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for script in scripts %}
+            <tr style="border-bottom: 1px solid var(--bs-border-color);">
+                <td style="padding: 15px; overflow: hidden;">
+                    <strong style="display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--bs-heading-color);" title="{{ script.name }}">{{ script.name }}</strong>
+                </td>
+                <td style="overflow: hidden;">
+                    <code style="display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.85rem; background: rgba(0,0,0,0.2); padding: 2px 5px; border-radius: 4px; color: var(--bs-info-text-emphasis);" title="{{ script.certificate.domain }}">{{ script.certificate.domain }}</code>
+                </td>
+                <td>
+                    <span class="badge" style="background: rgba(0,0,0,0.1); border: 1px solid var(--bs-border-color); color: var(--bs-body-color); white-space: nowrap;">{{ script.deployment_targets.count }} {% trans "Servers" %}</span>
+                </td>
+                <td>
+                    <small style="color: var(--bs-secondary-color); white-space: nowrap;">{{ script.last_executed|date:"Y-m-d H:i"|default:_("No History") }}</small>
+                </td>
+                <td style="text-align: right; padding-right: 16px;">
+                    <div style="display: flex; gap: 4px; justify-content: flex-end; align-items: center; flex-wrap: nowrap;">
+                        <a href="{% url 'core_cert:script_detail' script.pk %}" class="btn" style="background-color: #6366f1; color: white; padding: 5px 8px; font-size: 0.78rem; white-space: nowrap;">{% trans "Run" %}</a>
+                        <a href="{% url 'core_cert:script_edit' script.pk %}" class="btn" style="background-color: #94a3b8; color: white; padding: 5px 7px; font-size: 0.78rem;" title="{% trans "Edit" %}"><i class="bi bi-pencil"></i></a>
+                        <a href="{% url 'core_cert:script_delete' script.pk %}" class="btn" style="background-color: var(--error); color: white; padding: 5px 7px; font-size: 0.78rem;" title="{% trans "Delete" %}"><i class="bi bi-trash"></i></a>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" style="text-align: center; color: var(--bs-secondary-color); padding: 40px;">{% trans "No scripts registered." %}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{{ title|default:_("Confirm Delete") }} - AgnCert{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 600px; margin: 40px auto; padding: 30px; text-align: center;">
+    <div style="font-size: 3rem; color: #ef4444; margin-bottom: 20px;">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+    </div>
+    <h2 style="margin-top: 0; color: var(--bs-heading-color);">{{ title|default:_("Are you sure you want to delete?") }}</h2>
+    <div style="margin: 24px 0;">
+        <p style="color: var(--bs-secondary-color); line-height: 1.6;">
+            {% blocktrans with name=object.name|default:object %}
+            Are you sure you want to delete <strong>{{ name }}</strong>?<br>
+            This action cannot be undone.
+            {% endblocktrans %}
+        </p>
+    </div>
+    <form method="post" style="display: grid; gap: 20px; justify-content: center;">
+        {% csrf_token %}
+        
+        {% if is_certificate %}
+        <div style="background: rgba(239, 68, 68, 0.05); padding: 15px; border-radius: 8px; border: 1px solid rgba(239, 68, 68, 0.2); text-align: left;">
+            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; margin: 0; color: #f87171; font-weight: 600;">
+                <input type="checkbox" name="delete_files" style="width: 18px; height: 18px; cursor: pointer;">
+                {% trans "Delete physical certificate files (acme.sh folder)" %}
+            </label>
+            <p style="font-size: 0.8rem; color: var(--bs-secondary-color); margin: 8px 0 0 28px;">
+                {% trans "Warning: This will permanently remove the certificate folder from the server." %}
+            </p>
+        </div>
+        {% endif %}
+
+        <div style="display: flex; gap: 12px; justify-content: center;">
+            <a href="{{ cancel_url }}" class="btn btn-outline-secondary" style="padding: 10px 24px;">{% trans "Cancel" %}</a>
+            <button type="submit" class="btn btn-danger" style="padding: 10px 24px;">{% trans "Delete Now" %}</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
