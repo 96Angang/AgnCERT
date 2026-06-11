@@ -1,3 +1,5 @@
+<img width="800" height="410" alt="image" src="https://github.com/user-attachments/assets/37927a80-60d1-41fe-906f-2a77a9447443" />
+
 # AgnCERT
 
 English | [Korean](README.ko.md)
